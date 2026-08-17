@@ -1794,8 +1794,11 @@ function renderAlerts(){
     out.push(`<div class="alert green">Tijd voor je weekcheck — één minuut.
       <button class="btn small green" style="width:100%;" onclick="openWeekCheck()">Weekcheck doen</button></div>`);
 
-  if(!S.expenses.length)
-    out.push(`<div class="alert amber"><b>Begin hier.</b> Je vaste lasten kloppen, maar je vrije uitgaven worden nergens gemeten — en dáár verdwijnt het geld. Noteer vanaf vandaag elke uitgave. Over twee weken weet je precies waar het heen gaat.
+  if(!S.fixedCosts.length)
+    out.push(`<div class="alert amber"><b>Begin hier.</b> Zet eerst je vaste lasten en saldi erin — of importeer een back-up bij het tandwiel rechtsboven.
+      <button class="btn small" style="width:100%;" onclick="showView('lasten')">Vaste lasten invullen</button></div>`);
+  else if(!S.expenses.length)
+    out.push(`<div class="alert amber"><b>Nu het belangrijkste.</b> Je vaste lasten staan erin, maar je vrije uitgaven worden nergens gemeten — en dáár verdwijnt het geld. Noteer vanaf vandaag elke uitgave. Over twee weken weet je precies waar het heen gaat.
       <button class="btn small" style="width:100%;" onclick="showView('uitgaven')">Eerste uitgave noteren</button></div>`);
 
   document.getElementById("ovAlerts").innerHTML=out.join("");
