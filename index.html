@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Financiën">
+<meta name="theme-color" content="#13131f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='64'%20height='64'%20viewBox='0%200%20180%20180'%3E%3Cdefs%3E%3ClinearGradient%20id='g'%20x1='0'%20y1='0'%20x2='1'%20y2='1'%3E%3Cstop%20offset='0'%20stop-color='%237c5cff'/%3E%3Cstop%20offset='1'%20stop-color='%235b3fd6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='url(%23g)'/%3E%3Ctext%20x='90'%20y='124'%20font-family='Helvetica,Arial,sans-serif'%20font-size='110'%20font-weight='700'%20fill='%23fff'%20text-anchor='middle'%3E%E2%82%AC%3C/text%3E%3C/svg%3E">
+<title>Financiën — CreativeByKay</title>
+<style>
+  :root{
+    --bg:#0e0e16;
+    --bg2:#13131f;
+    --card:#1a1a28;
+    --card2:#22222f;
+    --line:#2c2c3d;
+    --txt:#ececf5;
+    --muted:#9a9ab0;
+    --accent:#7c5cff;
+    --accent2:#9d80ff;
+    --green:#3ddc84;
+    --red:#ff5a6e;
+    --amber:#ffb454;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.4;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:480px;margin:0 auto;padding:0 16px;}
+  header.top{
+    padding:calc(18px + env(safe-area-inset-top)) 0 8px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  header.top .brand{font-size:13px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+  header.top .date{font-size:13px;color:var(--muted);}
+  h1{font-size:20px;margin:4px 0 14px;font-weight:700;}
+  h2{font-size:15px;margin:22px 0 10px;color:var(--muted);font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .card.tap{cursor:pointer;transition:.12s;}
+  .card.tap:active{transform:scale(.985);background:var(--card2);}
+  .hero{
+    background:linear-gradient(135deg,#5b3df0,#7c5cff 55%,#9d80ff);
+    border:none;border-radius:24px;padding:22px;margin:6px 0 14px;
+    box-shadow:0 12px 30px -12px rgba(124,92,255,.6);
+  }
+  .hero .label{font-size:13px;opacity:.85;}
+  .hero .amount{font-size:38px;font-weight:800;letter-spacing:-1px;margin:4px 0 6px;}
+  .hero .delta{font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:5px;
+    background:rgba(255,255,255,.18);padding:4px 10px;border-radius:20px;}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .acct{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);}
+  .acct:last-child{border-bottom:none;}
+  .acct .nm{font-weight:600;font-size:15px;}
+  .acct .role{font-size:11px;color:var(--muted);margin-top:2px;}
+  .acct .bal{font-weight:700;font-size:16px;}
+  .listwrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;}
+  .pos{color:var(--green);}
+  .neg{color:var(--red);}
+  .muted{color:var(--muted);}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--card2);color:var(--muted);border:1px solid var(--line);}
+  .pill.biz{background:rgba(124,92,255,.18);color:var(--accent2);border-color:transparent;}
+  .pill.off{opacity:.5;text-decoration:line-through;}
+  button,.btn{
+    font-family:inherit;font-size:15px;font-weight:600;
+    border:none;border-radius:14px;padding:14px 16px;cursor:pointer;
+    background:var(--accent);color:#fff;width:100%;transition:.12s;
+  }
+  button:active,.btn:active{transform:scale(.98);}
+  .btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
+  .btn.danger{background:rgba(255,90,110,.15);color:var(--red);border:1px solid rgba(255,90,110,.3);}
+  .btn.small{padding:9px 12px;font-size:13px;width:auto;}
+  .btn.green{background:var(--green);color:#06281a;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid2 .btn{width:100%;}
+  input,select{
+    font-family:inherit;font-size:16px;width:100%;
+    background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    border-radius:12px;padding:13px 14px;outline:none;
+  }
+  input:focus,select:focus{border-color:var(--accent);}
+  label.fld{display:block;margin-bottom:12px;}
+  label.fld .lt{font-size:13px;color:var(--muted);margin-bottom:6px;display:block;}
+  .stat{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);}
+  .stat:last-child{border-bottom:none;}
+  .stat .k{color:var(--muted);font-size:14px;}
+  .stat .v{font-weight:700;font-size:16px;}
+  .big{font-size:26px;font-weight:800;}
+  .potgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+  .pot{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center;}
+  .pot .pl{font-size:11px;color:var(--muted);margin-bottom:4px;}
+  .pot .pv{font-size:17px;font-weight:800;}
+  .pot.vat{border-color:rgba(255,180,84,.35);}
+  .pot.ib{border-color:rgba(255,90,110,.35);}
+  .pot.pay{border-color:rgba(61,220,132,.35);}
+  nav.tabs{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    background:rgba(19,19,31,.92);backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    display:flex;justify-content:space-around;
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    max-width:480px;margin:0 auto;
+  }
+  nav.tabs button{
+    background:none;width:auto;flex:1;padding:6px 2px;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;
+  }
+  nav.tabs button.active{color:var(--accent2);}
+  nav.tabs svg{width:22px;height:22px;}
+  .view{display:none;animation:fade .2s;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+  .modal-bg.show{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--line);border-top-left-radius:24px;border-top-right-radius:24px;
+    width:100%;max-width:480px;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;
+    animation:slideup .22s;}
+  @keyframes slideup{from{transform:translateY(100%);}to{transform:none;}}
+  .modal h3{margin:0 0 14px;font-size:18px;}
+  .modal .grip{width:40px;height:4px;background:var(--line);border-radius:4px;margin:0 auto 14px;}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .cal .dow{font-size:10px;color:var(--muted);text-align:center;padding:2px 0;}
+  .cal .cell{aspect-ratio:1;border-radius:9px;background:var(--card);border:1px solid var(--line);
+    font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;color:var(--muted);padding:2px;}
+  .cal .cell.has{background:rgba(124,92,255,.14);border-color:rgba(124,92,255,.4);color:var(--txt);}
+  .cal .cell .dn{font-weight:700;font-size:12px;}
+  .cal .cell .amt{font-size:8px;color:var(--accent2);line-height:1.1;text-align:center;}
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;
+    padding:12px 18px;border-radius:14px;font-weight:600;font-size:14px;z-index:200;opacity:0;transition:.25s;pointer-events:none;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,.6);max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+  .tx{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line);font-size:14px;}
+  .tx:last-child{border-bottom:none;}
+  .tx .d{color:var(--muted);font-size:12px;}
+  .small-muted{font-size:12px;color:var(--muted);margin-top:6px;}
+  .divider{height:1px;background:var(--line);margin:16px 0;}
+  .iconbtn{background:var(--card2);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:11px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:18px;flex:none;}
+  .swrow{display:flex;align-items:center;gap:8px;}
+  .switch{position:relative;width:46px;height:27px;flex:none;}
+  .switch input{display:none;}
+  .switch .sl{position:absolute;inset:0;background:var(--line);border-radius:20px;transition:.2s;}
+  .switch .sl:before{content:"";position:absolute;width:21px;height:21px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;}
+  .switch input:checked + .sl{background:var(--accent);}
+  .switch input:checked + .sl:before{transform:translateX(19px);}
+  .note{background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);border-radius:12px;padding:12px;font-size:13px;color:var(--accent2);margin-bottom:12px;}
+  .calc-line{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .calc-line:last-child{border-bottom:none;}
+  .calc-line.tot{font-weight:800;font-size:16px;border-top:2px solid var(--accent);border-bottom:none;margin-top:4px;padding-top:12px;}
+  .calc-line.sub{font-size:13px;padding:6px 0;color:var(--muted);}
+  .dist-detail{margin:6px 0;}
+  .dist-detail summary{cursor:pointer;padding:6px 0;}
+  .dist-group{margin:6px 0 2px;}
+  .dist-h{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-top:8px;font-weight:700;}
+
+  /* ===== v2 — gezondheid, uitgaven, potjes, achterstanden ===== */
+  .score-hero{background:linear-gradient(135deg,#1b1b2c,#242438);border:1px solid var(--line);border-radius:24px;padding:18px;margin:6px 0 12px;}
+  .score-top{display:flex;align-items:center;gap:16px;}
+  .ring{position:relative;width:92px;height:92px;flex:none;}
+  .ring svg{transform:rotate(-90deg);width:92px;height:92px;}
+  .ring .rv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ring .rn{font-size:26px;font-weight:800;line-height:1;}
+  .ring .rl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+  .score-lab{font-size:19px;font-weight:800;}
+  .dom{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;}
+  .dom .dn{width:66px;color:var(--muted);flex:none;}
+  .dom .db{flex:1;height:6px;background:var(--card2);border-radius:6px;overflow:hidden;}
+  .dom .db i{display:block;height:100%;border-radius:6px;background:var(--accent);transition:width .4s;}
+  .dom .ds{width:38px;text-align:right;font-weight:700;font-size:11px;}
+  .bar{height:9px;background:var(--card2);border-radius:9px;overflow:hidden;margin:8px 0 6px;}
+  .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;}
+  .bar.green i{background:linear-gradient(90deg,#2fae68,var(--green));}
+  .bar.red i{background:linear-gradient(90deg,#d8394f,var(--red));}
+  .bar.amber i{background:linear-gradient(90deg,#e09030,var(--amber));}
+  .alert{border-radius:14px;padding:13px 14px;font-size:13px;margin-bottom:10px;border:1px solid;line-height:1.45;}
+  .alert.red{background:rgba(255,90,110,.12);border-color:rgba(255,90,110,.4);color:#ffb3bd;}
+  .alert.amber{background:rgba(255,180,84,.12);border-color:rgba(255,180,84,.4);color:#ffd9a3;}
+  .alert.green{background:rgba(61,220,132,.12);border-color:rgba(61,220,132,.4);color:#a8f0c8;}
+  .alert b{color:#fff;}
+  .alert .btn{margin-top:10px;}
+  .weekhero{background:linear-gradient(135deg,#5b3df0,#7c5cff 55%,#9d80ff);border-radius:24px;padding:20px;margin:6px 0 12px;box-shadow:0 12px 30px -12px rgba(124,92,255,.6);}
+  .weekhero.over{background:linear-gradient(135deg,#c22b40,#ff5a6e 60%,#ff8593);box-shadow:0 12px 30px -12px rgba(255,90,110,.6);}
+  .weekhero .wl{font-size:13px;opacity:.85;}
+  .weekhero .wa{font-size:36px;font-weight:800;letter-spacing:-1px;margin:2px 0 10px;}
+  .weekhero .wb{height:8px;background:rgba(255,255,255,.25);border-radius:8px;overflow:hidden;}
+  .weekhero .wb i{display:block;height:100%;background:#fff;border-radius:8px;transition:width .4s;}
+  .weekhero .wf{display:flex;justify-content:space-between;font-size:12px;opacity:.92;margin-top:8px;}
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 2px;}
+  .chip{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:13px;padding:10px 5px;
+    font-size:11px;font-weight:600;width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.15;text-align:center;}
+  .chip.on{background:rgba(124,92,255,.28);border-color:var(--accent);color:#fff;}
+  .chip .e{font-size:19px;}
+  .qamt{font-size:34px;font-weight:800;text-align:center;padding:10px 0 2px;letter-spacing:-1px;}
+  .qamt.zero{color:var(--muted);}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+  .keypad button{background:var(--card2);border:1px solid var(--line);color:var(--txt);font-size:21px;font-weight:700;padding:15px 0;border-radius:14px;}
+  .keypad button.act{background:var(--accent);border-color:var(--accent);color:#fff;font-size:15px;}
+  .keypad button.del{font-size:17px;color:var(--muted);}
+  .daygroup{padding:9px 16px 5px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:var(--card2);}
+  .goal{padding:14px 16px;border-bottom:1px solid var(--line);}
+  .goal:last-child{border-bottom:none;}
+  .goal .gt{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .goal .gn{font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;}
+  .goal .gv{font-size:13px;font-weight:700;white-space:nowrap;}
+  .goal .gm{font-size:11px;color:var(--muted);margin-top:5px;}
+  .phase{display:flex;align-items:center;gap:11px;padding:10px 0;font-size:13px;border-bottom:1px solid var(--line);}
+  .phase:last-child{border-bottom:none;}
+  .phase .pi{width:23px;height:23px;border-radius:50%;border:2px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted);}
+  .phase.done .pi{background:var(--green);border-color:var(--green);color:#06281a;}
+  .phase.now .pi{border-color:var(--accent);color:var(--accent2);}
+  .phase .pn{flex:1;color:var(--muted);}
+  .phase.done .pn,.phase.now .pn{color:var(--txt);}
+  .phase .pv{font-weight:700;font-size:12px;color:var(--muted);}
+  .phase.now .pv{color:var(--accent2);}
+  .streak{display:inline-flex;align-items:center;gap:6px;background:rgba(255,180,84,.15);border:1px solid rgba(255,180,84,.35);color:var(--amber);border-radius:20px;padding:4px 11px;font-size:12px;font-weight:700;}
+  .catrow{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13px;}
+  .catrow .cn{width:104px;flex:none;display:flex;align-items:center;gap:5px;overflow:hidden;white-space:nowrap;}
+  .catrow .cn span{overflow:hidden;text-overflow:ellipsis;}
+  .catrow .cb{flex:1;height:7px;background:var(--card2);border-radius:7px;overflow:hidden;}
+  .catrow .cb i{display:block;height:100%;border-radius:7px;background:var(--accent);}
+  .catrow .cv{width:68px;text-align:right;font-weight:700;}
+  .seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:3px;margin-bottom:12px;}
+  .seg button{background:none;color:var(--muted);font-size:13px;padding:9px 4px;border-radius:10px;flex:1;font-weight:600;}
+  .seg button.on{background:var(--accent);color:#fff;}
+  .gearbtn{background:none;width:auto;padding:4px;color:var(--muted);display:inline-flex;align-items:center;}
+  .gearbtn svg{width:19px;height:19px;}
+  .hdr-right{display:flex;align-items:center;gap:8px;}
+  .wknav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .wknav button{background:var(--card2);border:1px solid var(--line);color:var(--txt);width:38px;height:34px;border-radius:11px;padding:0;font-size:15px;flex:none;}
+  .wknav button:disabled{opacity:.35;}
+  .wknav .wt{font-size:13px;font-weight:600;color:var(--muted);text-align:center;flex:1;}
+  .emptybox{padding:22px 16px;text-align:center;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <span class="brand">CreativeByKay · Financiën</span>
+    <span class="hdr-right">
+      <span class="date" id="todayDate"></span>
+      <button class="gearbtn" onclick="showView('instellingen')" aria-label="Instellingen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 2.6 14H2.5a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4 7.5l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9 4.6h.1A2 2 0 1 1 13 4.6v.1A1.6 1.6 0 0 0 17 7l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.1a2 2 0 1 1 0 4h-.1z"/></svg>
+      </button>
+    </span>
+  </header>
+
+  <!-- ============ OVERZICHT ============ -->
+  <section class="view active" id="view-overzicht">
+    <h1>Overzicht</h1>
+
+    <div id="ovAlerts"></div>
+
+    <div class="score-hero" id="scoreHero" onclick="openScoreDetail()"></div>
+
+    <div id="ovWeek"></div>
+    <div id="ovBuffer"></div>
+
+    <div class="hero">
+      <div class="label">Totaal vermogen</div>
+      <div class="amount" id="totalWealth">€ 0,00</div>
+      <span class="delta" id="wealthDelta">—</span>
+    </div>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:6px;">
+        <h2 style="margin:0;">Vermogensgroei</h2>
+      </div>
+      <canvas id="growthChart" data-h="110"></canvas>
+      <div class="small-muted" id="chartHint">Sluit een maand af via "Verdelen" om punten toe te voegen.</div>
+    </div>
+
+    <div class="row" style="margin-top:22px;margin-bottom:10px;">
+      <h2 style="margin:0;">Vermogen</h2>
+      <button class="btn small" onclick="openAddAccount()">+ Toevoegen</button>
+    </div>
+    <div class="listwrap" id="vermogenList"></div>
+
+    <h2>Bedrijfsrekening</h2>
+    <div class="listwrap" id="zakelijkList"></div>
+
+    <button class="btn sec" onclick="showView('verdelen')">Salaris binnengekomen → maand plannen</button>
+  </section>
+
+  <!-- ============ UITGAVEN ============ -->
+  <section class="view" id="view-uitgaven">
+    <h1>Uitgaven</h1>
+
+    <div id="weekHero"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Snel invoeren</h2>
+      <div class="qamt zero" id="qAmount">€ 0</div>
+      <div class="chips" id="catChips"></div>
+      <div class="keypad">
+        <button onclick="qKey('1')">1</button><button onclick="qKey('2')">2</button><button onclick="qKey('3')">3</button>
+        <button onclick="qKey('4')">4</button><button onclick="qKey('5')">5</button><button onclick="qKey('6')">6</button>
+        <button onclick="qKey('7')">7</button><button onclick="qKey('8')">8</button><button onclick="qKey('9')">9</button>
+        <button onclick="qKey(',')">,</button><button onclick="qKey('0')">0</button><button class="del" onclick="qKey('back')">⌫</button>
+      </div>
+      <button class="btn green" style="margin-top:10px;" onclick="saveQuickExpense()">Uitgave opslaan</button>
+      <div class="small-muted">Tik het bedrag, kies een categorie, opslaan. Klaar in drie seconden.</div>
+    </div>
+
+    <div class="wknav">
+      <button onclick="shiftWeek(-1)">‹</button>
+      <div class="wt" id="weekTitle"></div>
+      <button id="wkNext" onclick="shiftWeek(1)">›</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Waar ging het heen</h2>
+      <div id="catBreakdown"></div>
+    </div>
+
+    <h2>Uitgaven deze week</h2>
+    <div class="listwrap" id="expenseList"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Laatste 4 weken</h2>
+      <div id="weekTrend"></div>
+    </div>
+  </section>
+
+  <!-- ============ DOELEN ============ -->
+  <section class="view" id="view-doelen">
+    <h1>Doelen</h1>
+
+    <div id="arrearsBlock"></div>
+
+    <h2>Noodbuffer</h2>
+    <div class="card" id="bufferCard"></div>
+
+    <div class="row" style="margin-top:22px;margin-bottom:10px;">
+      <h2 style="margin:0;">Potjes</h2>
+      <button class="btn small" onclick="openPotModal()">+ Toevoegen</button>
+    </div>
+    <div class="note">Potjes zijn voor uitgaven die je ziet aankomen: vakantie, kleding, cadeaus, tandarts. Zet er maandelijks iets in, dan hoeft je spaargeld er nooit meer aan.</div>
+    <div class="listwrap" id="potList"></div>
+    <div class="card" id="potSummary"></div>
+  </section>
+
+  <!-- ============ VERDELEN ============ -->
+  <section class="view" id="view-verdelen">
+    <h1>Salaris verdelen</h1>
+    <div class="note">Tik op de knop wanneer je salaris binnenkomt. De app rekent uit wat naar elke rekening moet en sluit de maand af in je grafiek.</div>
+
+    <div class="card">
+      <label class="fld">
+        <span class="lt">Ontvangen salaris (netto)</span>
+        <input type="number" inputmode="decimal" id="salaryInput" step="0.01" oninput="calcDistribution()">
+      </label>
+      <button onclick="calcDistribution()">Bereken verdeling</button>
+    </div>
+
+    <div id="distResult"></div>
+  </section>
+
+  <!-- ============ VASTE LASTEN ============ -->
+  <section class="view" id="view-lasten">
+    <h1>Vaste lasten</h1>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="muted" style="font-size:13px;">Totaal actief per maand</div>
+          <div class="big" id="fixedTotal">€ 0,00</div>
+        </div>
+        <button class="btn small" onclick="openCostModal()">+ Toevoegen</button>
+      </div>
+    </div>
+
+    <div id="lastenNeeds"></div>
+
+    <h2>Kalender — wat gaat wanneer eraf</h2>
+    <div class="card">
+      <div class="cal" id="calendar"></div>
+    </div>
+
+    <h2>Alle posten</h2>
+    <div class="listwrap" id="costList"></div>
+  </section>
+
+  <!-- ============ BEDRIJF ============ -->
+  <section class="view" id="view-bedrijf">
+    <h1>Bedrijf · KNAB</h1>
+
+    <h2>Potjes dit jaar</h2>
+    <div class="potgrid">
+      <div class="pot vat"><div class="pl">BTW-pot</div><div class="pv" id="potVat">€ 0</div></div>
+      <div class="pot ib"><div class="pl">Inkomstenbel.</div><div class="pv" id="potIb">€ 0</div></div>
+      <div class="pot pay"><div class="pl">Uit te keren</div><div class="pv" id="potPay">€ 0</div></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Inkomst boeken</h2>
+      <label class="fld">
+        <span class="lt">Ontvangen bedrag (incl. 21% BTW)</span>
+        <input type="number" inputmode="decimal" id="bizInput" step="0.01" oninput="previewBiz()">
+      </label>
+      <div id="bizPreview"></div>
+      <button onclick="bookIncome()">Boek inkomst op KNAB</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Uitkeren aan mezelf</h2>
+      <div class="stat"><span class="k">Beschikbaar in uitkeer-pot</span><span class="v pos" id="payAvail">€ 0,00</span></div>
+      <label class="fld" style="margin-top:12px;">
+        <span class="lt">Naar welke rekening</span>
+        <select id="payToAccount"></select>
+      </label>
+      <button class="btn green" onclick="payoutSelf()">Keer uit aan mezelf</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Bedrijfskosten & winst</h2>
+      <div class="stat"><span class="k">Zakelijke abonnementen / maand</span><span class="v neg" id="bizCostMonthly">€ 0,00</span></div>
+      <div class="stat"><span class="k">Omzet excl. BTW (dit jaar)</span><span class="v" id="bizRevenueYear">€ 0,00</span></div>
+      <div class="stat"><span class="k">Bedrijfskosten (dit jaar)</span><span class="v neg" id="bizCostYear">€ 0,00</span></div>
+      <div class="stat"><span class="k">Werkelijke winst (dit jaar)</span><span class="v pos" id="bizProfitYear">€ 0,00</span></div>
+      <div class="small-muted">Zakelijke kosten zijn BTW-aftrekbaar. Je zakelijke abonnementen (maandkosten) worden automatisch meegenomen in de salaris-verdeling onder "Verdelen".</div>
+    </div>
+
+    <button class="btn sec" onclick="openBizHistory()">Inkomsten-historie bekijken</button>
+  </section>
+
+  <!-- ============ INSTELLINGEN ============ -->
+  <section class="view" id="view-instellingen">
+    <button class="btn sec" style="margin:6px 0 14px;" onclick="showView('overzicht')">‹ Terug naar overzicht</button>
+    <h1>Instellingen</h1>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Weekbudget & buffer</h2>
+      <label class="fld">
+        <span class="lt">Weekbudget vrije uitgaven (€)</span>
+        <input type="number" inputmode="decimal" id="setWeek" step="1">
+      </label>
+      <div class="small-muted" id="weekSuggest" style="margin-top:-6px;margin-bottom:12px;"></div>
+      <label class="fld">
+        <span class="lt">Buffer-doel in maanden lasten</span>
+        <input type="number" inputmode="numeric" id="setBufMonths" step="1" min="1" max="12">
+      </label>
+      <button onclick="saveSettings()">Opslaan</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Percentages & streefbedragen</h2>
+      <label class="fld">
+        <span class="lt">BTW-tarief (%)</span>
+        <input type="number" inputmode="decimal" id="setVat" step="0.1">
+      </label>
+      <label class="fld">
+        <span class="lt">Reservering inkomstenbelasting (%)</span>
+        <input type="number" inputmode="decimal" id="setIb" step="0.1">
+      </label>
+      <label class="fld">
+        <span class="lt">Streefbedrag leefrekening (€)</span>
+        <input type="number" inputmode="decimal" id="setLeef" step="0.01">
+      </label>
+      <button onclick="saveSettings()">Opslaan</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Back-up</h2>
+      <div class="grid2">
+        <button class="btn sec" onclick="exportData()">Exporteer JSON</button>
+        <button class="btn sec" onclick="document.getElementById('importFile').click()">Importeer JSON</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)">
+      <div class="small-muted">Exporteer regelmatig als back-up. Importeer om over te zetten naar een nieuwe telefoon.</div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Resetten</h2>
+      <div class="grid2">
+        <button class="btn danger" onclick="resetMonth()">Reset maand</button>
+        <button class="btn danger" onclick="resetAll()">Reset alles</button>
+      </div>
+      <div class="small-muted">"Reset maand" wist het laatste grafiekpunt. "Reset alles" zet alles terug naar de startdata.</div>
+    </div>
+
+    <div class="small-muted" style="text-align:center;margin:18px 0;">Lokaal opgeslagen op dit apparaat · niets gaat naar een server.</div>
+  </section>
+</div>
+
+<!-- NAV -->
+<nav class="tabs">
+  <button data-view="overzicht" class="active" onclick="showView('overzicht')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5 12 3l9 6.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>
+    Overzicht
+  </button>
+  <button data-view="uitgaven" onclick="showView('uitgaven')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-5 4 3 5-7"/><path d="M17 8h4v4"/><path d="M3 21h18"/></svg>
+    Uitgaven
+  </button>
+  <button data-view="doelen" onclick="showView('doelen')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+    Doelen
+  </button>
+  <button data-view="lasten" onclick="showView('lasten')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
+    Lasten
+  </button>
+  <button data-view="bedrijf" onclick="showView('bedrijf')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    Bedrijf
+  </button>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ---------- Startdata ---------- */
+const DEFAULT_STATE = {
+  salary: 0,
+  settings: { vatRate: 21, ibRate: 40, leefTarget: 500, weekBudget: 175, bufferMonths: 3 },
+  accounts: [
+    { id:"vasteLasten", name:"Vaste lasten rekening", balance:0, role:"Hoofdrekening — salaris komt hier binnen", group:"operationeel" },
+    { id:"leef",        name:"Leefrekening",          balance:0, role:"Vrije uitgaven", group:"operationeel" },
+    { id:"creditTrans", name:"Tweede rekening",       balance:0, role:"Extra betaalrekening", group:"operationeel" },
+    { id:"creditcard",  name:"Creditcard",            balance:0, role:"Abonnementen", group:"operationeel" },
+    { id:"degiro",      name:"Beleggingen",           balance:0, role:"Beleggingsportefeuille", group:"vermogen" },
+    { id:"spaar",       name:"Spaarrekening",         balance:0, role:"Hier groeit je buffer", group:"vermogen" },
+    { id:"knab",        name:"Zakelijke rekening",    balance:0, role:"Netto uit te keren (na BTW & belasting)", group:"zakelijk" }
+  ],
+  fixedCosts: [],
+  business: { vatPot:0, ibPot:0, payoutPot:0, revenueYear:0, costYear:0, log:[] },
+  history: [],
+  transactions: [],
+  categories: [
+    { id:"boodschappen", name:"Boodschappen",       emoji:"🛒" },
+    { id:"eten",         name:"Uit eten & bezorgen", emoji:"🍽️" },
+    { id:"uitgaan",      name:"Uitgaan & weekend",   emoji:"🍻" },
+    { id:"shoppen",      name:"Shoppen & tech",      emoji:"🛍️" },
+    { id:"vervoer",      name:"Vervoer & benzine",   emoji:"🚗" },
+    { id:"overig",       name:"Overig",              emoji:"📦" }
+  ],
+  expenses: [],
+  pots: [
+    { id:c(), name:"Vakantie",              emoji:"🏖️", target:1200, saved:0, due:"" },
+    { id:c(), name:"Kleding & shoppen",     emoji:"👕",  target:600,  saved:0, due:"" },
+    { id:c(), name:"Cadeaus & feestdagen",  emoji:"🎁",  target:400,  saved:0, due:"" },
+    { id:c(), name:"Tandarts & eigen risico",emoji:"🦷", target:385,  saved:0, due:"" },
+    { id:c(), name:"Tech & apparatuur",     emoji:"💻",  target:500,  saved:0, due:"" }
+  ],
+  arrears: [],
+  checkins: [],
+  scoreHistory: []
+};
+function c(){ return "id"+Math.random().toString(36).slice(2,9); }
+
+/* ---------- State ---------- */
+const KEY = "kay_finance_v1";
+let S = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return seed();
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.accounts ? migrate(parsed) : seed();
+  }catch(e){ return seed(); }
+}
+function migrate(st){
+  // Oudere opslag bevat nog geen "group" op rekeningen → toewijzen zodat het overzicht werkt.
+  const groupMap = { degiro:"vermogen", spaar:"vermogen", knab:"zakelijk" };
+  st.accounts.forEach(a=>{
+    if(!a.group) a.group = groupMap[a.id] || "operationeel";
+    if(a.id==="degiro" && /intel|magnum|rigetti/i.test(a.role||"")) a.role = "Beleggingsportefeuille";
+  });
+  // business velden borgen
+  st.business = Object.assign({ vatPot:0, ibPot:0, payoutPot:0, revenueYear:0, costYear:0, log:[] }, st.business||{});
+  if(!Array.isArray(st.history)) st.history = [{ label:"Start", total:vermogen(st) }];
+  if(!Array.isArray(st.transactions)) st.transactions = [];
+  // v2: uitgaven, potjes, achterstanden, weekcheck, score
+  st.settings = Object.assign({ vatRate:21, ibRate:40, leefTarget:500, weekBudget:175, bufferMonths:3 }, st.settings||{});
+  if(!Array.isArray(st.categories) || !st.categories.length) st.categories = JSON.parse(JSON.stringify(DEFAULT_STATE.categories));
+  if(!Array.isArray(st.expenses))     st.expenses = [];
+  if(!Array.isArray(st.pots))         st.pots = JSON.parse(JSON.stringify(DEFAULT_STATE.pots));
+  if(!Array.isArray(st.arrears))      st.arrears = [];
+  if(!Array.isArray(st.checkins))     st.checkins = [];
+  if(!Array.isArray(st.scoreHistory)) st.scoreHistory = [];
+  st.pots.forEach(p=>{ if(!p.id) p.id=c(); p.saved=Number(p.saved)||0; p.target=Number(p.target)||0; });
+  st.arrears.forEach(a=>{ if(!a.id) a.id=c(); a.amount=Number(a.amount)||0; a.paid=Number(a.paid)||0; });
+  return st;
+}
+function seed(){
+  const s = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  s.history.push({ label:"Start", total:vermogen(s) });
+  return s;
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ toast("Opslaan mislukt"); }
+}
+
+/* ---------- Helpers ---------- */
+function eur(n){
+  if(n===null||n===undefined||isNaN(n)) n=0;
+  return "€ " + Number(n).toLocaleString("nl-NL",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function eurShort(n){
+  if(isNaN(n)) n=0;
+  return "€ " + Math.round(Number(n)).toLocaleString("nl-NL");
+}
+function num(v){ const n = parseFloat(String(v).replace(",",".")); return isNaN(n)?0:n; }
+function acct(id){ return S.accounts.find(a=>a.id===id); }
+function netWorth(st){ st=st||S; return st.accounts.reduce((s,a)=>s+(Number(a.balance)||0),0); }
+function vermogen(st){
+  st=st||S;
+  // Vermogen = beleggingen + spaar + extra vermogen-rekeningen + netto op zakelijke rekening
+  return st.accounts
+    .filter(a=>a.group==="vermogen"||a.group==="zakelijk")
+    .reduce((s,a)=>s+(Number(a.balance)||0),0);
+}
+function activeFixed(){ return S.fixedCosts.filter(f=>f.active); }
+function businessMonthly(){ return activeFixed().filter(f=>f.business).reduce((s,f)=>s+f.amount,0); }
+/* Hoeveel moet er begin van de maand op elke rekening staan:
+   = som van actieve lasten per rekening (+ leefbudget op de leefrekening). */
+function accountNeeds(){
+  const map = {};
+  activeFixed().forEach(f=>{ map[f.account] = (map[f.account]||0) + f.amount; });
+  map["leef"] = (map["leef"]||0) + (Number(S.settings.leefTarget)||0);  // vast maandbudget bovenop evt. lasten
+  return Object.keys(map)
+    .map(id=>({ id, name: acct(id)?acct(id).name:id, total: map[id] }))
+    .filter(r=>r.total>0)
+    .sort((a,b)=>b.total-a.total);
+}
+function accountNeedsHTML(){
+  const needs = accountNeeds();
+  const totaal = needs.reduce((s,r)=>s+r.total,0);
+  return `
+    <div class="card">
+      <h2 style="margin-top:0;">Begin van de maand op elke rekening</h2>
+      <div class="small-muted" style="margin-bottom:8px;">Zoveel moet er op elke rekening staan om je lasten + leefbudget te dekken.</div>
+      ${needs.map(r=>`<div class="calc-line"><span>${esc(r.name)}</span><span>${eur(r.total)}</span></div>`).join("")}
+      <div class="calc-line tot"><span>Totaal nodig</span><span>${eur(totaal)}</span></div>
+    </div>`;
+}
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),2200);
+}
+
+/* ---------- Navigation ---------- */
+function showView(v){
+  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
+  document.getElementById("view-"+v).classList.add("active");
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active", b.dataset.view===v));
+  window.scrollTo(0,0);
+  if(v==="overzicht") renderOverview();
+  if(v==="uitgaven") renderUitgaven();
+  if(v==="doelen") renderDoelen();
+  if(v==="lasten") renderLasten();
+  if(v==="bedrijf") renderBedrijf();
+  if(v==="verdelen"){ document.getElementById("salaryInput").value = S.salary>0 ? S.salary.toFixed(2) : ""; calcDistribution(); }
+  if(v==="instellingen") fillSettings();
+}
+
+/* ---------- Modal ---------- */
+function openModal(html){
+  document.getElementById("modalBody").innerHTML = '<div class="grip"></div>'+html;
+  document.getElementById("modalBg").classList.add("show");
+}
+function closeModal(){ document.getElementById("modalBg").classList.remove("show"); }
+
+/* ========== OVERVIEW ========== */
+function renderOverview(){
+  renderAlerts();
+  renderScore();
+  renderOvWeek();
+  renderOvBuffer();
+  document.getElementById("totalWealth").textContent = eur(vermogen());
+
+  // month-over-month growth from the last two recorded points
+  const h = S.history;
+  const d = document.getElementById("wealthDelta");
+  if(h.length>=2){
+    const dd = h[h.length-1].total - h[h.length-2].total;
+    d.textContent = (dd>=0?"▲ ":"▼ ")+eur(Math.abs(dd))+" deze maand";
+    d.style.background = dd>=0 ? "rgba(61,220,132,.25)" : "rgba(255,90,110,.25)";
+  } else {
+    d.textContent = "Eerste maand";
+    d.style.background = "rgba(255,255,255,.18)";
+  }
+
+  const renderGroup = (container, group)=>{
+    container.innerHTML = "";
+    const items = S.accounts.filter(a=>a.group===group);
+    if(!items.length){ container.innerHTML = '<div class="tx"><span class="d">Nog niets</span></div>'; return; }
+    items.forEach(a=>{
+      const el = document.createElement("div");
+      el.className="acct";
+      el.onclick = ()=>openAccountModal(a.id);
+      el.innerHTML = `<div><div class="nm">${esc(a.name)}</div><div class="role">${esc(a.role||"")}</div></div>
+        <div class="bal ${a.balance<0?'neg':''}">${eur(a.balance)}</div>`;
+      container.appendChild(el);
+    });
+  };
+  renderGroup(document.getElementById("vermogenList"), "vermogen");
+  renderGroup(document.getElementById("zakelijkList"), "zakelijk");
+
+  drawChart();
+}
+/* self-contained canvas chart — no external library, works fully offline */
+function drawChart(){
+  const canvas = document.getElementById("growthChart");
+  if(!canvas) return;
+  const hint = document.getElementById("chartHint");
+  const pts = S.history.map(p=>({label:p.label, val:Number(p.total)||0}));
+  if(hint) hint.style.display = pts.length>1 ? "none" : "block";
+
+  // crisp rendering on retina screens
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || canvas.parentElement.clientWidth || 320;
+  const cssH = Number(canvas.dataset.h) || 110;
+  canvas.style.width = "100%";
+  canvas.style.height = cssH + "px";
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  const ctx = canvas.getContext("2d");
+  if(!ctx) return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cssW,cssH);
+
+  if(pts.length===0) return;
+
+  const padL = 44, padR = 12, padT = 12, padB = 22;
+  const plotW = cssW - padL - padR;
+  const plotH = cssH - padT - padB;
+
+  // value range with 12% padding
+  let min = Math.min(...pts.map(p=>p.val));
+  let max = Math.max(...pts.map(p=>p.val));
+  if(min===max){ min -= Math.abs(min)*0.1 || 10; max += Math.abs(max)*0.1 || 10; }
+  const span = max - min;
+  min -= span*0.12; max += span*0.12;
+  const range = (max-min) || 1;
+
+  const X = i => pts.length===1 ? padL + plotW/2 : padL + (plotW * i/(pts.length-1));
+  const Y = v => padT + plotH * (1 - (v-min)/range);
+
+  const fmtK = v => v>=1000 || v<=-1000 ? "€"+(v/1000).toFixed(1).replace(".",",")+"k" : "€"+Math.round(v);
+
+  // horizontal gridlines + y-labels
+  const rows = 4;
+  ctx.font = "10px -apple-system,system-ui,sans-serif";
+  ctx.textBaseline = "middle";
+  for(let r=0;r<=rows;r++){
+    const v = min + range*r/rows;
+    const y = Y(v);
+    ctx.strokeStyle = "#2c2c3d";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(cssW-padR,y); ctx.stroke();
+    ctx.fillStyle = "#9a9ab0";
+    ctx.textAlign = "right";
+    ctx.fillText(fmtK(v), padL-6, y);
+  }
+
+  // gradient area fill under the line
+  if(pts.length>1){
+    const grad = ctx.createLinearGradient(0,padT,0,padT+plotH);
+    grad.addColorStop(0,"rgba(124,92,255,.32)");
+    grad.addColorStop(1,"rgba(124,92,255,0)");
+    ctx.beginPath();
+    ctx.moveTo(X(0),Y(pts[0].val));
+    pts.forEach((p,i)=>ctx.lineTo(X(i),Y(p.val)));
+    ctx.lineTo(X(pts.length-1), padT+plotH);
+    ctx.lineTo(X(0), padT+plotH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // line stroke
+  ctx.strokeStyle = "#9d80ff";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  pts.forEach((p,i)=>{ const x=X(i),y=Y(p.val); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  // point dots
+  pts.forEach((p,i)=>{
+    ctx.beginPath();
+    ctx.arc(X(i),Y(p.val),3.5,0,Math.PI*2);
+    ctx.fillStyle = "#9d80ff";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#16161f";
+    ctx.stroke();
+  });
+
+  // x-axis labels (thin out if crowded)
+  ctx.fillStyle = "#9a9ab0";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  const step = Math.ceil(pts.length / 6);
+  pts.forEach((p,i)=>{
+    if(i % step !== 0 && i !== pts.length-1) return;
+    ctx.fillText(String(p.label||""), X(i), padT+plotH+6);
+  });
+}
+
+function openAccountModal(id){
+  const a = acct(id);
+  openModal(`
+    <h3>${esc(a.name)}</h3>
+    <div class="stat"><span class="k">Huidig saldo</span><span class="v">${eur(a.balance)}</span></div>
+    <div class="divider"></div>
+    <label class="fld"><span class="lt">Saldo handmatig instellen (€)</span>
+      <input type="number" inputmode="decimal" id="m_setbal" step="0.01" value="${(Number(a.balance)||0).toFixed(2)}"></label>
+    <button class="btn sec" onclick="setBalance('${id}')">Saldo opslaan</button>
+    <div class="divider"></div>
+    <label class="fld"><span class="lt">Omschrijving</span>
+      <input type="text" id="m_txdesc" placeholder="bijv. Boodschappen"></label>
+    <label class="fld"><span class="lt">Bedrag (€)</span>
+      <input type="number" inputmode="decimal" id="m_txamt" step="0.01"></label>
+    <label class="fld swrow" style="margin-bottom:14px;"><span class="lt" style="margin:0;flex:1;">Zakelijke kosten <span class="muted">(telt mee als bedrijfskosten)</span></span>
+      <span class="switch"><input type="checkbox" id="m_bizcost"><span class="sl"></span></span></label>
+    <div class="grid2">
+      <button class="btn green" onclick="addTx('${id}',1)">+ Bijschrijven</button>
+      <button class="btn danger" onclick="addTx('${id}',-1)">− Afschrijven</button>
+    </div>
+    <div class="divider"></div>
+    <h2 style="margin-top:0;">Recente transacties</h2>
+    <div id="m_txlist">${renderTxList(id)}</div>
+    ${a.custom?`<div class="divider"></div><button class="btn danger" onclick="deleteAccount('${id}')">Rekening verwijderen</button>`:''}
+  `);
+}
+function renderTxList(id){
+  const list = S.transactions.filter(t=>t.accountId===id).slice(-8).reverse();
+  if(!list.length) return '<div class="small-muted">Nog geen transacties.</div>';
+  return list.map(t=>`<div class="tx"><div><div>${esc(t.desc||"Transactie")}</div><div class="d">${t.date}</div></div>
+    <div class="${t.amount>=0?'pos':'neg'}">${t.amount>=0?'+':''}${eur(t.amount)}</div></div>`).join("");
+}
+function setBalance(id){
+  const a=acct(id); a.balance = num(document.getElementById("m_setbal").value);
+  if(id==="knab") S.business.payoutPot = a.balance;
+  save(); renderOverview(); openAccountModal(id); toast("Saldo bijgewerkt");
+}
+function addTx(id,sign){
+  const amt = num(document.getElementById("m_txamt").value);
+  if(amt<=0){ toast("Vul een bedrag in"); return; }
+  const cb = document.getElementById("m_bizcost");
+  const bizCost = cb && cb.checked;
+  const a=acct(id); const signed = amt*sign;
+  a.balance += signed;
+  let desc = document.getElementById("m_txdesc").value || "Transactie";
+  if(sign<0 && bizCost){ S.business.costYear += amt; desc = "[Zakelijk] "+desc; }
+  if(id==="knab") S.business.payoutPot = a.balance;
+  S.transactions.push({ accountId:id, amount:signed, desc, date:dateStr() });
+  save(); renderOverview(); openAccountModal(id);
+  toast(sign>0 ? "Bijgeschreven" : (bizCost?"Afgeschreven · bedrijfskosten":"Afgeschreven"));
+}
+function openAddAccount(){
+  openModal(`
+    <h3>Vermogen toevoegen</h3>
+    <div class="small-muted" style="margin-bottom:14px;">Bijv. een tweede beleggingsrekening, crypto of een ander spaarpotje. Telt mee in je totale vermogen.</div>
+    <label class="fld"><span class="lt">Naam</span><input type="text" id="na_name" placeholder="bijv. Bitvavo crypto"></label>
+    <label class="fld"><span class="lt">Korte omschrijving (optioneel)</span><input type="text" id="na_role"></label>
+    <label class="fld"><span class="lt">Startsaldo (€)</span><input type="number" inputmode="decimal" id="na_bal" step="0.01" value="0"></label>
+    <button onclick="saveAccount()">Toevoegen</button>
+  `);
+}
+function saveAccount(){
+  const name=document.getElementById("na_name").value.trim();
+  if(!name){ toast("Vul een naam in"); return; }
+  S.accounts.push({ id:c(), name, role:document.getElementById("na_role").value.trim(),
+    balance:num(document.getElementById("na_bal").value), group:"vermogen", custom:true });
+  save(); closeModal(); renderOverview(); toast("Toegevoegd aan vermogen");
+}
+function deleteAccount(id){
+  if(!confirm("Deze rekening verwijderen?")) return;
+  S.accounts = S.accounts.filter(a=>a.id!==id);
+  save(); closeModal(); renderOverview(); toast("Verwijderd");
+}
+
+/* ========== VERDELEN ========== */
+function calcDistribution(){
+  const salary = num(document.getElementById("salaryInput").value);
+  if(salary<=0){
+    document.getElementById("distResult").innerHTML =
+      '<div class="card"><div class="small-muted">Vul je ontvangen salaris in om de verdeling te zien. De verdeling gebruikt automatisch je actieve vaste lasten en bedrijfskosten.</div></div>';
+    return;
+  }
+  S.salary = salary; save();
+
+  // ALLE actieve lasten meenemen, ongeacht op welke rekening ze geboekt staan
+  const priveLasten = activeFixed().filter(f=>!f.business);
+  const zakLasten   = activeFixed().filter(f=>f.business);
+  const priveVaste  = priveLasten.reduce((s,f)=>s+f.amount,0);
+  const bizKosten   = zakLasten.reduce((s,f)=>s+f.amount,0);
+  const leefBedrag  = weekBudget()*4.345;               // vrije uitgaven volgens je weekbudget
+  const potjes      = S.pots.reduce((s,p)=>s+potMonthly(p),0);
+  const inhalen     = arrearsOpen()>0 ? Math.min(arrearsOpen(), Math.max(0, salary-priveVaste-bizKosten-leefBedrag)) : 0;
+  const rest = salary - priveVaste - bizKosten - leefBedrag - potjes - inhalen;
+
+  // Realiteitscheck: wat gaf je de afgelopen 4 weken werkelijk uit aan vrije uitgaven?
+  let werkelijk=0, gemeten=0;
+  for(let i=1;i<=4;i++){ const r=weekRange(-i); const it=expensesBetween(r.start,r.end); if(it.length){ gemeten++; werkelijk+=it.reduce((s,e)=>s+e.amount,0); } }
+  const werkelijkMaand = gemeten ? werkelijk/gemeten*4.345 : null;
+  const echteRest = werkelijkMaand!==null ? salary-priveVaste-bizKosten-werkelijkMaand : null;
+
+  const html = `
+    <div class="card">
+      <h2 style="margin-top:0;">Plan voor ${eur(salary)}</h2>
+      <div class="calc-line"><span>Privé vaste lasten <span class="muted">(${priveLasten.length} posten)</span></span><span>${eur(priveVaste)}</span></div>
+      <div class="calc-line"><span>Zakelijke lasten <span class="muted">(${zakLasten.length} posten)</span></span><span>${eur(bizKosten)}</span></div>
+      <div class="calc-line"><span>→ Vrije uitgaven <span class="muted">(${eur(weekBudget())} per week)</span></span><span>${eur(leefBedrag)}</span></div>
+      ${potjes>0?`<div class="calc-line"><span>→ Potjes <span class="muted">(vakantie, kleding, tandarts…)</span></span><span>${eur(potjes)}</span></div>`:""}
+      ${inhalen>0?`<div class="calc-line"><span>→ Achterstand inlopen</span><span class="neg">${eur(inhalen)}</span></div>`:""}
+      <div class="calc-line tot"><span>→ Naar je buffer</span><span class="${rest<0?'neg':'pos'}">${eur(rest)}</span></div>
+      ${rest<0?'<div class="small-muted neg">Dit plan past niet: je verplichtingen en budgetten zijn samen hoger dan je salaris. Verlaag je weekbudget of stel een potje uit.</div>':''}
+      ${werkelijkMaand!==null?`
+        <div class="divider"></div>
+        <div class="dist-h">Realiteitscheck</div>
+        <div class="calc-line"><span>Werkelijk uitgegeven <span class="muted">(gemeten over ${gemeten} ${gemeten===1?"week":"weken"})</span></span><span class="${werkelijkMaand>leefBedrag?'neg':'pos'}">${eur(werkelijkMaand)}</span></div>
+        <div class="calc-line"><span>Wat er in dat tempo écht overblijft</span><span class="${echteRest<0?'neg':'pos'}">${eur(echteRest)}</span></div>
+        <div class="small-muted">${werkelijkMaand>leefBedrag
+          ? "Je geeft "+eur(werkelijkMaand-leefBedrag)+" per maand meer uit dan je plan. Dát is het verschil tussen sparen en niets overhouden."
+          : "Je blijft binnen je plan. Zo bouw je buffer op."}</div>`
+        :`<div class="small-muted">Zodra je een paar weken uitgaven bijhoudt, laat de app hier zien wat je wérkelijk uitgeeft — niet alleen wat je van plan was.</div>`}
+      <details class="dist-detail"><summary class="small-muted">Toon alle lasten</summary>
+        <div class="dist-group"><div class="dist-h">Privé lasten</div>${priveLasten.map(f=>`<div class="calc-line sub"><span>${esc(f.name)}</span><span>${eur(f.amount)}</span></div>`).join("")||'<div class="small-muted">geen</div>'}</div>
+        <div class="dist-group"><div class="dist-h">Zakelijke lasten</div>${zakLasten.map(f=>`<div class="calc-line sub"><span>${esc(f.name)}</span><span>${eur(f.amount)}</span></div>`).join("")||'<div class="small-muted">geen</div>'}</div>
+      </details>
+      <div class="small-muted">Bij bevestigen worden je potjes bijgewerkt${rest>0?" en gaat "+eur(rest)+" naar je buffer":""}, en wordt de maand vastgelegd in je grafiek.${inhalen>0?" Je achterstand boek je zelf af bij Doelen zodra je écht betaald hebt.":""}</div>
+      <div class="divider"></div>
+      <label class="fld"><span class="lt">Maandlabel voor grafiek</span>
+        <input type="text" id="monthLabel" value="${monthLabel()}"></label>
+      <button class="btn green" onclick="confirmDistribution(${rest},${potjes})">Bevestig plan & sluit maand af</button>
+    </div>
+    ${accountNeedsHTML()}`;
+  document.getElementById("distResult").innerHTML = html;
+}
+function confirmDistribution(rest, potjes){
+  potjes = Number(potjes)||0;
+  // Operationele rekeningen (vaste lasten, leef, credit transport) beheer je zelf bij de bank.
+  // Potjes en buffer staan allebei fysiek op de spaarrekening; de app houdt het uit elkaar.
+  if(potjes>0){
+    S.pots.forEach(p=>{ const m=potMonthly(p); if(m>0) p.saved=Math.min(p.target, p.saved+m); });
+    acct("spaar").balance += potjes;
+    S.transactions.push({accountId:"spaar", amount:potjes, desc:"Maandstorting potjes", date:dateStr()});
+  }
+  if(rest>0){
+    acct("spaar").balance += rest;
+    S.transactions.push({accountId:"spaar", amount:rest, desc:"Salaris verdeeld → buffer", date:dateStr()});
+  }
+  // record month — vermogen = spaar + beleggingen + netto zakelijk
+  const label = (document.getElementById("monthLabel").value||monthLabel()).trim();
+  S.history.push({ label, total:vermogen() });
+  recordScore();
+  save();
+  toast("Maand afgesloten · grafiek bijgewerkt");
+  document.getElementById("distResult").innerHTML = "";
+  showView("overzicht");
+}
+
+/* ========== VASTE LASTEN ========== */
+function renderLasten(){
+  document.getElementById("fixedTotal").textContent = eur(activeFixed().reduce((s,f)=>s+f.amount,0));
+  document.getElementById("lastenNeeds").innerHTML = accountNeedsHTML();
+
+  // cost list
+  const list = document.getElementById("costList");
+  list.innerHTML = "";
+  S.fixedCosts.forEach(f=>{
+    const accName = acct(f.account)?acct(f.account).name:"?";
+    const dayTxt = f.day>0 ? ("rond de "+f.day+"e") : "wisselend";
+    const el = document.createElement("div");
+    el.className="acct";
+    el.innerHTML = `
+      <div style="flex:1" onclick="openCostModal('${f.id}')">
+        <div class="nm" style="${f.active?'':'opacity:.5;text-decoration:line-through;'}">${esc(f.name)}</div>
+        <div class="role">${dayTxt} · ${esc(accName)} ${f.business?'<span class="pill biz">zakelijk</span>':''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="bal" style="${f.active?'':'opacity:.5;'}">${eur(f.amount)}</div>
+        <label class="switch"><input type="checkbox" ${f.active?'checked':''} onchange="toggleCost('${f.id}')"><span class="sl"></span></label>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  renderCalendar();
+}
+function renderCalendar(){
+  const cal = document.getElementById("calendar");
+  cal.innerHTML = "";
+  ["M","D","W","D","V","Z","Z"].forEach(d=>{
+    const h=document.createElement("div"); h.className="dow"; h.textContent=d; cal.appendChild(h);
+  });
+  const now = new Date();
+  const year=now.getFullYear(), month=now.getMonth();
+  const first = new Date(year,month,1);
+  let startDow = (first.getDay()+6)%7; // monday=0
+  const days = new Date(year,month+1,0).getDate();
+  const byDay = {};
+  activeFixed().forEach(f=>{ if(f.day>0){ (byDay[f.day]=byDay[f.day]||[]).push(f); } });
+  for(let i=0;i<startDow;i++){ const e=document.createElement("div"); cal.appendChild(e); }
+  for(let d=1; d<=days; d++){
+    const cell=document.createElement("div");
+    const has = byDay[d];
+    cell.className="cell"+(has?" has":"");
+    let inner=`<div class="dn">${d}</div>`;
+    if(has){ const tot=has.reduce((s,f)=>s+f.amount,0); inner+=`<div class="amt">${eurShort(tot)}</div>`; cell.onclick=()=>showDay(d,has); }
+    cell.innerHTML=inner;
+    cal.appendChild(cell);
+  }
+}
+function showDay(d,items){
+  const rows = items.map(f=>`<div class="calc-line"><span>${esc(f.name)}</span><span>${eur(f.amount)}</span></div>`).join("");
+  const tot = items.reduce((s,f)=>s+f.amount,0);
+  openModal(`<h3>Dag ${d}</h3>${rows}<div class="calc-line tot"><span>Totaal</span><span>${eur(tot)}</span></div>
+    <button class="btn sec" style="margin-top:14px;" onclick="closeModal()">Sluiten</button>`);
+}
+function toggleCost(id){
+  const f=S.fixedCosts.find(x=>x.id===id); f.active=!f.active; save(); renderLasten();
+}
+function openCostModal(id){
+  const f = id ? S.fixedCosts.find(x=>x.id===id) : null;
+  const defAcct = f ? f.account : "vasteLasten";
+  const opts = S.accounts.map(a=>`<option value="${a.id}" ${a.id===defAcct?'selected':''}>${esc(a.name)}</option>`).join("");
+  // nieuwe post default: zakelijk als de gekozen rekening de creditcard is
+  const biz = f ? !!f.business : (defAcct==="creditcard");
+  openModal(`
+    <h3>${f?'Post bewerken':'Nieuwe vaste last'}</h3>
+    <label class="fld"><span class="lt">Naam</span><input type="text" id="c_name" value="${f?esc(f.name):''}"></label>
+    <label class="fld"><span class="lt">Bedrag (€)</span><input type="number" inputmode="decimal" id="c_amt" step="0.01" value="${f?f.amount:''}"></label>
+    <label class="fld"><span class="lt">Afschrijfdag (0 = wisselend)</span><input type="number" inputmode="numeric" id="c_day" min="0" max="31" value="${f?f.day:0}"></label>
+    <label class="fld"><span class="lt">Van rekening</span>
+      <select id="c_acct" onchange="if(this.value==='creditcard')setBizType(true);">${opts}</select></label>
+    <div class="lt">Type</div>
+    <div class="grid2" style="margin-bottom:16px;">
+      <button type="button" id="c_prive_btn" class="btn sec" onclick="setBizType(false)">Privé</button>
+      <button type="button" id="c_biz_btn" class="btn sec" onclick="setBizType(true)">Zakelijk (BTW)</button>
+    </div>
+    <button onclick="saveCost('${id||''}')">Opslaan</button>
+    ${f?`<button class="btn danger" style="margin-top:10px;" onclick="deleteCost('${id}')">Verwijderen</button>`:''}
+  `);
+  setBizType(biz);
+}
+let _bizType = false;
+function setBizType(v){
+  _bizType = !!v;
+  const p=document.getElementById("c_prive_btn"), b=document.getElementById("c_biz_btn");
+  if(!p||!b) return;
+  p.style.background = v?"var(--card2)":"var(--accent)";
+  p.style.color = v?"var(--txt)":"#fff";
+  b.style.background = v?"var(--accent)":"var(--card2)";
+  b.style.color = v?"#fff":"var(--txt)";
+}
+function saveCost(id){
+  const name=document.getElementById("c_name").value.trim();
+  const amt=num(document.getElementById("c_amt").value);
+  if(!name||amt<=0){ toast("Vul naam en bedrag in"); return; }
+  const obj={ name, amount:amt, day:Math.max(0,Math.min(31,parseInt(document.getElementById("c_day").value)||0)),
+    account:document.getElementById("c_acct").value, business:_bizType, vatDeductible:_bizType };
+  if(id){ const f=S.fixedCosts.find(x=>x.id===id); Object.assign(f,obj); }
+  else { obj.id=c(); obj.active=true; S.fixedCosts.push(obj); }
+  save(); closeModal(); renderLasten(); toast("Opgeslagen");
+}
+function deleteCost(id){
+  if(!confirm("Deze post verwijderen?")) return;
+  S.fixedCosts = S.fixedCosts.filter(x=>x.id!==id);
+  save(); closeModal(); renderLasten(); toast("Verwijderd");
+}
+/* ========== BEDRIJF ========== */
+function renderBedrijf(){
+  const b=S.business;
+  document.getElementById("potVat").textContent = eurShort(b.vatPot);
+  document.getElementById("potIb").textContent = eurShort(b.ibPot);
+  document.getElementById("potPay").textContent = eurShort(b.payoutPot);
+  document.getElementById("payAvail").textContent = eur(b.payoutPot);
+  document.getElementById("bizCostMonthly").textContent = eur(businessMonthly());
+  document.getElementById("bizRevenueYear").textContent = eur(b.revenueYear);
+  document.getElementById("bizCostYear").textContent = eur(b.costYear);
+  document.getElementById("bizProfitYear").textContent = eur(b.revenueYear - b.costYear);
+
+  const sel = document.getElementById("payToAccount");
+  sel.innerHTML = S.accounts.filter(a=>a.group==="vermogen").map(a=>`<option value="${a.id}" ${a.id==="spaar"?"selected":""}>${esc(a.name)}</option>`).join("");
+  previewBiz();
+}
+function previewBiz(){
+  const bedrag = num(document.getElementById("bizInput").value);
+  const vr = S.settings.vatRate/100, ir = S.settings.ibRate/100;
+  const vat = bedrag/(1+vr)*vr;
+  const omzet = bedrag/(1+vr);
+  const ib = omzet*ir;
+  const netto = omzet - ib;
+  document.getElementById("bizPreview").innerHTML = bedrag>0 ? `
+    <div class="calc-line"><span>BTW-deel (${S.settings.vatRate}%) → BTW-pot</span><span class="amber" style="color:var(--amber)">${eur(vat)}</span></div>
+    <div class="calc-line"><span>Omzet excl. BTW</span><span>${eur(omzet)}</span></div>
+    <div class="calc-line"><span>Inkomstenbel. (${S.settings.ibRate}%) → IB-pot</span><span class="neg">${eur(ib)}</span></div>
+    <div class="calc-line tot"><span>Netto uit te keren</span><span class="pos">${eur(netto)}</span></div>
+  ` : "";
+}
+function bookIncome(){
+  const bedrag = num(document.getElementById("bizInput").value);
+  if(bedrag<=0){ toast("Vul een bedrag in"); return; }
+  const vr=S.settings.vatRate/100, ir=S.settings.ibRate/100;
+  const vat=bedrag/(1+vr)*vr, omzet=bedrag/(1+vr), ib=omzet*ir, netto=omzet-ib;
+  const b=S.business;
+  // Alleen het netto-deel blijft op de zakelijke rekening staan.
+  // BTW en inkomstenbelasting worden apart in de potjes weggezet.
+  acct("knab").balance += netto;
+  b.vatPot+=vat; b.ibPot+=ib; b.payoutPot+=netto; b.revenueYear+=omzet;
+  b.log.push({date:dateStr(), bedrag, vat, omzet, ib, netto});
+  S.transactions.push({accountId:"knab",amount:netto,desc:"Bedrijfsinkomst (netto na BTW & belasting)",date:dateStr()});
+  save();
+  document.getElementById("bizInput").value="";
+  renderBedrijf();
+  toast("Netto "+eur(netto)+" op KNAB · BTW & IB apart gezet");
+}
+function payoutSelf(){
+  const b=S.business;
+  if(b.payoutPot<=0){ toast("Niets uit te keren"); return; }
+  const to=document.getElementById("payToAccount").value;
+  const amount=b.payoutPot;
+  if(acct("knab").balance < amount){ toast("Onvoldoende saldo op KNAB"); return; }
+  acct("knab").balance -= amount;
+  acct(to).balance += amount;
+  S.transactions.push({accountId:"knab",amount:-amount,desc:"Uitgekeerd aan mezelf",date:dateStr()});
+  S.transactions.push({accountId:to,amount:amount,desc:"Ontvangen van KNAB",date:dateStr()});
+  b.payoutPot=0;
+  save(); renderBedrijf();
+  toast("Uitgekeerd: "+eur(amount));
+}
+function openBizHistory(){
+  const log=S.business.log.slice().reverse();
+  const rows = log.length ? log.map(l=>`<div class="tx"><div><div>${eur(l.bedrag)} incl.</div><div class="d">${l.date} · BTW ${eur(l.vat)} · IB ${eur(l.ib)}</div></div><div class="pos">${eur(l.netto)}</div></div>`).join("")
+    : '<div class="small-muted">Nog geen inkomsten geboekt.</div>';
+  openModal(`<h3>Inkomsten-historie ${new Date().getFullYear()}</h3>${rows}
+    <button class="btn sec" style="margin-top:14px;" onclick="closeModal()">Sluiten</button>`);
+}
+
+/* ========== INSTELLINGEN ========== */
+function fillSettings(){
+  document.getElementById("setVat").value=S.settings.vatRate;
+  document.getElementById("setIb").value=S.settings.ibRate;
+  document.getElementById("setLeef").value=S.settings.leefTarget;
+  document.getElementById("setWeek").value=S.settings.weekBudget;
+  document.getElementById("setBufMonths").value=S.settings.bufferMonths;
+  // Plafond: wat je maximaal vrij kunt uitgeven als je 10% spaart (Nibud-richtlijn) én je potjes vult.
+  const inc=Number(S.salary)||0;
+  const potjes=S.pots.reduce((s,p)=>s+potMonthly(p),0);
+  const max=(inc-fixedTotalAll()-inc*0.10-potjes)/4.345;
+  document.getElementById("weekSuggest").innerHTML = inc>0
+    ? (max>0
+        ? "Bovengrens: <b>"+eur(max)+"</b> per week. Meer dan dit kun je niet vrij uitgeven als je 10% van je inkomen wilt sparen (Nibud-richtlijn) én je potjes wilt vullen. Kies gerust lager — hoe lager, hoe sneller je buffer groeit."
+        : "Je vaste lasten en potjes laten op dit moment geen ruimte voor 10% sparen. Begin met een bedrag dat je écht haalt en verlaag het stap voor stap.")
+    : "Vul eerst je salaris in bij Verdelen voor een suggestie.";
+}
+function saveSettings(){
+  S.settings.vatRate=num(document.getElementById("setVat").value)||21;
+  S.settings.ibRate=num(document.getElementById("setIb").value)||40;
+  S.settings.leefTarget=num(document.getElementById("setLeef").value)||500;
+  S.settings.weekBudget=Math.max(0,num(document.getElementById("setWeek").value));
+  S.settings.bufferMonths=clamp(num(document.getElementById("setBufMonths").value)||3,1,12);
+  save(); fillSettings(); toast("Instellingen opgeslagen");
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="financien-backup-"+dateStr()+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast("Back-up gedownload");
+}
+function importData(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const obj=JSON.parse(r.result);
+      if(!obj.accounts) throw new Error("ongeldig");
+      if(!confirm("Huidige data overschrijven met deze back-up?")) return;
+      S=migrate(obj); save(); showView("overzicht"); toast("Data geïmporteerd");
+    }catch(e){ toast("Ongeldig back-up bestand"); }
+  };
+  r.readAsText(file);
+  ev.target.value="";
+}
+function resetMonth(){
+  if(S.history.length<=1){ toast("Geen maand om te resetten"); return; }
+  if(!confirm("Laatste grafiekpunt verwijderen?")) return;
+  S.history.pop(); save(); renderOverview(); toast("Laatste maand verwijderd");
+}
+function resetAll(){
+  if(!confirm("ALLES terugzetten naar startdata? Dit kan niet ongedaan worden.")) return;
+  if(!confirm("Echt zeker? Al je ingevulde bedragen gaan verloren.")) return;
+  S=seed(); save(); showView("overzicht"); toast("Alles gereset");
+}
+
+/* ============================================================
+   v2 — FINANCIËLE GEZONDHEID
+   Uitgaven bijhouden, potjes, buffer, achterstanden, score.
+   ============================================================ */
+
+/* ---------- datum & week ---------- */
+function isoDate(d){ const x=new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function mondayOf(d){ const x=new Date(d); const day=x.getDay()||7; x.setDate(x.getDate()-day+1); x.setHours(0,0,0,0); return x; }
+function weekRange(offset){ const start=addDays(mondayOf(new Date()), offset*7); return { start, end: addDays(start,6) }; }
+function weekKeyOf(d){
+  const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const day=x.getUTCDay()||7;
+  x.setUTCDate(x.getUTCDate()+4-day);
+  const y0=new Date(Date.UTC(x.getUTCFullYear(),0,1));
+  const wn=Math.ceil(((x-y0)/86400000+1)/7);
+  return x.getUTCFullYear()+"-W"+String(wn).padStart(2,"0");
+}
+function daysLeftInWeek(){ return 7-(new Date().getDay()||7)+1; }
+function dayLabel(iso){
+  if(iso===isoDate(new Date())) return "Vandaag";
+  if(iso===isoDate(addDays(new Date(),-1))) return "Gisteren";
+  return new Date(iso+"T00:00:00").toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"short"});
+}
+function nlDate(iso){ const d=new Date(iso+"T00:00:00"); return isNaN(d)?iso:d.toLocaleDateString("nl-NL",{day:"numeric",month:"short",year:"numeric"}); }
+function nlMonth(ym){ const p=String(ym).split("-").map(Number); if(!p[0]||!p[1]) return ym; return new Date(p[0],p[1]-1,1).toLocaleDateString("nl-NL",{month:"long",year:"numeric"}); }
+function monthsUntil(ym){ const p=String(ym).split("-").map(Number); if(!p[0]||!p[1]) return 12; const n=new Date(); return Math.max(1,(p[0]-n.getFullYear())*12+(p[1]-(n.getMonth()+1))); }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function clamp01(v){ return clamp(v,0,1); }
+
+/* ---------- kerncijfers ---------- */
+function fixedTotalAll(){ return activeFixed().reduce((s,f)=>s+f.amount,0); }
+function weekBudget(){ return Number(S.settings.weekBudget)||0; }
+/* Werkelijke maandlasten = vaste lasten + het weekbudget waar je van leeft. */
+function maandlasten(){ return fixedTotalAll() + weekBudget()*4.345; }
+function potsSaved(){ return S.pots.reduce((s,p)=>s+(Number(p.saved)||0),0); }
+/* Buffer = spaarrekening minus wat er al geoormerkt in potjes zit. */
+function bufferAmount(){ const a=acct("spaar"); return Math.max(0,(a?Number(a.balance)||0:0) - potsSaved()); }
+function arrearsOpen(){ return S.arrears.reduce((s,a)=>s+Math.max(0,(Number(a.amount)||0)-(Number(a.paid)||0)),0); }
+function negativeBalances(){ return S.accounts.reduce((s,a)=>s+Math.min(0,Number(a.balance)||0),0); }
+/* Wat er per week overblijft na vaste lasten en weekbudget. */
+function weeklyRoom(){ const room=(Number(S.salary)||0)-fixedTotalAll()-weekBudget()*4.345; return room>0?room/4.345:0; }
+/* Wat er per week naar de buffer kan nadat potjes en achterstanden hun deel hebben gehad. */
+function bufferWeeklyRoom(){
+  const potsW=S.pots.reduce((s,p)=>s+potMonthly(p),0)/4.345;
+  const open=arrearsOpen();
+  const arrW=open>0 ? open/Math.max(1,weeksUntilEarliestDue(S.arrears.filter(a=>(a.amount-a.paid)>0.005))) : 0;
+  return Math.max(0, weeklyRoom()-potsW-arrW);
+}
+
+function expensesBetween(start,end){
+  const a=isoDate(start), b=isoDate(end);
+  return S.expenses.filter(e=>e.date>=a && e.date<=b);
+}
+function weekSpent(offset){ const r=weekRange(offset); return expensesBetween(r.start,r.end).reduce((s,e)=>s+(Number(e.amount)||0),0); }
+function catOf(id){ return S.categories.find(x=>x.id===id) || {name:"Overig",emoji:"📦"}; }
+function catName(id){ return catOf(id).name; }
+function catEmoji(id){ return catOf(id).emoji; }
+function wkLabel(off){
+  if(off===0) return "deze week";
+  if(off===-1) return "vorige week";
+  const r=weekRange(off);
+  return r.start.toLocaleDateString("nl-NL",{day:"numeric",month:"short"})+" – "+r.end.toLocaleDateString("nl-NL",{day:"numeric",month:"short"});
+}
+
+/* ---------- buffer in fasen ---------- */
+function bufferPhases(){
+  const m=maandlasten();
+  return [
+    { label:"Mini-buffer",            target:500 },
+    { label:"Startbuffer",            target:1000 },
+    { label:"3 maanden vaste lasten", target:m*3 },
+    { label:"6 maanden vaste lasten", target:m*6 }
+  ];
+}
+function currentPhase(){
+  const amt=bufferAmount(), phases=bufferPhases();
+  let i=phases.findIndex(p=>amt<p.target);
+  if(i<0) i=phases.length-1;
+  return { i, phase:phases[i], phases, amt, prev: i>0?phases[i-1].target:0 };
+}
+
+/* ---------- weekcheck ---------- */
+function currentWeekKey(){ return weekKeyOf(new Date()); }
+function checkinDone(){ return S.checkins.some(x=>x.week===currentWeekKey()); }
+function checkinStreak(){
+  if(!S.checkins.length) return 0;
+  const keys=new Set(S.checkins.map(x=>x.week));
+  let n=0;
+  for(let i=0;i<104;i++){
+    const k=weekKeyOf(addDays(mondayOf(new Date()),-7*i));
+    if(keys.has(k)) n++;
+    else if(i===0) continue;   // deze week mag nog open staan
+    else break;
+  }
+  return n;
+}
+
+/* ---------- gezondheidsscore (5 domeinen à 20 punten) ---------- */
+function healthScore(){
+  const inc=Number(S.salary)||0, fixed=fixedTotalAll(), m=maandlasten(), d={};
+
+  // 1. INKOMEN — hoe zwaar drukken je vaste lasten op je inkomen
+  const ratio = inc>0 ? fixed/inc : 1;
+  d.inkomen = { score: inc>0 ? clamp01((0.70-ratio)/(0.70-0.30))*20 : 0, max:20,
+    note: inc>0 ? Math.round(ratio*100)+"% van je inkomen gaat naar vaste lasten (streef onder 50%)" : "Vul je salaris in bij Verdelen" };
+
+  // 2. UITGAVEN — hoe vaak bleef je binnen je weekbudget
+  let measured=0, ok=0;
+  for(let i=1;i<=4;i++){
+    const r=weekRange(-i);
+    if(expensesBetween(r.start,r.end).length){ measured++; if(weekSpent(-i)<=weekBudget()) ok++; }
+  }
+  d.uitgaven = { score: measured?(ok/measured)*20:0, max:20, unmeasured: measured===0,
+    note: measured ? ok+" van "+measured+" gemeten weken binnen je weekbudget" : "Nog niets bijgehouden — hier liggen 20 punten klaar" };
+
+  // 3. SPAREN — buffer uitgedrukt in maanden lasten
+  const months = m>0 ? bufferAmount()/m : 0;
+  let sp;
+  if(months>=6) sp=20; else if(months>=3) sp=15+(months-3)/3*5;
+  else if(months>=1) sp=8+(months-1)/2*7; else sp=months*8;
+  d.sparen = { score: clamp(sp,0,20), max:20,
+    note: months>0 ? months.toFixed(1)+" maanden vaste lasten in buffer" : "Nog geen buffer opgebouwd" };
+
+  // 4. LENEN — achterstanden en rode standen
+  const open=arrearsOpen()+Math.abs(negativeBalances());
+  let ln = open<=0 ? 20 : (m>0 ? clamp(20*(1-open/m),0,20) : 0);
+  if(S.arrears.some(a=>a.critical && (a.amount-a.paid)>0)) ln=Math.min(ln,8);
+  d.lenen = { score:ln, max:20, note: open>0 ? eur(open)+" staat open" : "Geen achterstanden of rode standen" };
+
+  // 5. PLANNEN — potjes, weekcheck, belastingpotjes, maandplan
+  let pl=0; const parts=[];
+  const potTarget=S.pots.reduce((s,x)=>s+(Number(x.target)||0),0);
+  const cover = potTarget>0 ? potsSaved()/potTarget : 0;
+  pl += clamp01(cover)*6;
+  if(cover>0) parts.push(Math.round(cover*100)+"% van je potjes gevuld");
+  const st=checkinStreak();
+  pl += clamp01(st/4)*5;
+  if(st>0) parts.push(st+" "+(st===1?"week":"weken")+" ingecheckt");
+  if((S.business.vatPot||0)>0 || (S.business.ibPot||0)>0){ pl+=4; parts.push("BTW & IB apart gezet"); }
+  if(weekBudget()>0) pl+=2;
+  if(S.history.length>=2){ pl+=3; parts.push("maanden vastgelegd"); }
+  d.plannen = { score: clamp(pl,0,20), max:20, note: parts.length?parts.join(" · "):"Nog weinig vooruit gepland" };
+
+  const total=Math.round(d.inkomen.score+d.uitgaven.score+d.sparen.score+d.lenen.score+d.plannen.score);
+  return { total, domains:d, label:scoreLabel(total), color:scoreColor(total) };
+}
+function scoreLabel(s){ return s>=80?"Financieel gezond": s>=60?"Adequaat": s>=40?"Kwetsbaar":"Ongezond"; }
+function scoreColor(s){ return s>=80?"var(--green)": s>=60?"var(--accent2)": s>=40?"var(--amber)":"var(--red)"; }
+function pctColor(p){ return p>=80?"var(--green)": p>=60?"var(--accent2)": p>=40?"var(--amber)":"var(--red)"; }
+function recordScore(){
+  const m=isoDate(new Date()).slice(0,7);
+  const r=healthScore();
+  const ex=S.scoreHistory.find(x=>x.month===m);
+  if(ex) ex.score=r.total; else S.scoreHistory.push({ month:m, score:r.total });
+}
+
+const DOMAIN_INFO = {
+  inkomen:  "Verdien je genoeg ten opzichte van wat je elke maand vast kwijt bent? Onder 50% is gezond, onder 30% is uitstekend.",
+  uitgaven: "Blijf je binnen het budget dat je jezelf geeft? Dit is het domein waar de meeste mensen hun geld verliezen zonder het te merken.",
+  sparen:   "Kun je een tegenslag opvangen zonder te lenen? Gemeten in maanden dat je van je buffer kunt leven.",
+  lenen:    "Sta je rood, heb je achterstanden of leningen? Achterstanden worden vanzelf duurder, dus die kosten hier het hardst punten.",
+  plannen:  "Zet je geld apart voor wat je ziet aankomen — vakantie, belasting, tandarts — en kijk je er elke week even naar?"
+};
+
+/* ---------- score weergeven ---------- */
+function renderScore(){
+  const el=document.getElementById("scoreHero"); if(!el) return;
+  const r=healthScore();
+  const C=2*Math.PI*38;
+  const off=C*(1-r.total/100);
+  const doms=[["Inkomen","inkomen"],["Uitgaven","uitgaven"],["Sparen","sparen"],["Lenen","lenen"],["Plannen","plannen"]];
+  el.innerHTML=`
+    <div class="score-top">
+      <div class="ring">
+        <svg viewBox="0 0 92 92">
+          <circle cx="46" cy="46" r="38" fill="none" stroke="var(--card2)" stroke-width="9"/>
+          <circle cx="46" cy="46" r="38" fill="none" stroke="${r.color}" stroke-width="9" stroke-linecap="round"
+                  stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+        </svg>
+        <div class="rv"><div class="rn">${r.total}</div><div class="rl">van 100</div></div>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="score-lab" style="color:${r.color}">${r.label}</div>
+        <div class="small-muted" style="margin-top:3px;">Financiële gezondheid over 5 domeinen · tik voor uitleg</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;">
+      ${doms.map(function(x){
+        const d=r.domains[x[1]], pct=d.score/d.max*100;
+        return '<div class="dom"><div class="dn">'+x[0]+'</div><div class="db"><i style="width:'+pct.toFixed(0)+'%;background:'+pctColor(pct)+'"></i></div><div class="ds">'+Math.round(d.score)+'/20</div></div>';
+      }).join("")}
+    </div>`;
+}
+function openScoreDetail(){
+  const r=healthScore();
+  const doms=[["Inkomen","inkomen"],["Uitgaven","uitgaven"],["Sparen","sparen"],["Lenen","lenen"],["Plannen","plannen"]];
+  const hist=S.scoreHistory.slice(-6);
+  openModal(`
+    <h3>Je score: ${r.total}/100 — ${r.label}</h3>
+    <div class="small-muted" style="margin-bottom:14px;">Opgebouwd uit vijf domeinen van 20 punten. Dit is dezelfde indeling die Nibud en Deloitte gebruiken om financiële gezondheid te meten: inkomen, uitgaven, sparen, lenen en plannen.</div>
+    ${doms.map(function(x){
+      const d=r.domains[x[1]], pct=d.score/d.max*100;
+      return `<div style="margin-bottom:14px;">
+        <div class="row"><b>${x[0]}</b><span style="font-weight:800;color:${pctColor(pct)}">${Math.round(d.score)}/20</span></div>
+        <div class="bar" style="margin:6px 0;"><i style="width:${pct.toFixed(0)}%;background:${pctColor(pct)}"></i></div>
+        <div style="font-size:12px;">${esc(d.note)}</div>
+        <div class="small-muted">${DOMAIN_INFO[x[1]]}</div>
+      </div>`;
+    }).join("")}
+    ${hist.length>1?`<div class="divider"></div><div class="dist-h">Verloop</div>
+      ${hist.map(h=>`<div class="calc-line"><span>${nlMonth(h.month)}</span><span style="color:${scoreColor(h.score)};font-weight:700;">${h.score}</span></div>`).join("")}`:""}
+    <div class="divider"></div>
+    <div class="small-muted">0–39 ongezond · 40–59 kwetsbaar · 60–79 adequaat · 80–100 gezond. De score wordt vastgelegd zodra je een weekcheck afrondt.</div>
+    <button class="btn sec" style="margin-top:14px;" onclick="closeModal()">Sluiten</button>`);
+}
+
+/* ========== UITGAVEN ========== */
+let weekOffset=0, qBuf="", qCat=null;
+
+function renderUitgaven(){
+  if(!qCat) qCat=(S.categories[0]||{}).id;
+  renderWeekHero(); renderChips(); renderWeekNav();
+  renderCatBreakdown(); renderExpenseList(); renderWeekTrend();
+  updateQAmount();
+}
+function renderWeekHero(){
+  const wb=weekBudget(), spent=weekSpent(weekOffset), left=wb-spent;
+  const pct=wb>0?clamp(spent/wb*100,0,100):0;
+  const dl=daysLeftInWeek();
+  document.getElementById("weekHero").innerHTML=`
+    <div class="weekhero ${left<0?'over':''}">
+      <div class="wl">${weekOffset===0?"Nog te besteden deze week":"Restant "+wkLabel(weekOffset)}</div>
+      <div class="wa">${eur(left)}</div>
+      <div class="wb"><i style="width:${pct.toFixed(0)}%"></i></div>
+      <div class="wf"><span>${eur(spent)} uitgegeven</span><span>budget ${eur(wb)}</span></div>
+      ${weekOffset===0?`<div class="wf"><span>${dl} ${dl===1?"dag":"dagen"} te gaan</span><span>${left>0?eur(left/dl)+" per dag":"budget op"}</span></div>`:""}
+    </div>`;
+}
+function renderChips(){
+  document.getElementById("catChips").innerHTML=S.categories.map(x=>
+    `<button class="chip ${x.id===qCat?"on":""}" onclick="pickCat('${x.id}')"><span class="e">${x.emoji}</span>${esc(x.name)}</button>`).join("");
+}
+function pickCat(id){ qCat=id; renderChips(); }
+function updateQAmount(){
+  const el=document.getElementById("qAmount"); if(!el) return;
+  el.textContent = qBuf ? "€ "+qBuf : "€ 0";
+  el.classList.toggle("zero", !qBuf);
+}
+function qKey(k){
+  if(k==="back") qBuf=qBuf.slice(0,-1);
+  else if(k===","){ if(qBuf && qBuf.indexOf(",")<0) qBuf+=","; }
+  else {
+    const parts=qBuf.split(",");
+    if(parts.length>1 && parts[1].length>=2) return;
+    if(qBuf.length>=9) return;
+    qBuf = (qBuf==="0") ? k : qBuf+k;
+  }
+  updateQAmount();
+}
+function saveQuickExpense(){
+  const amt=num(qBuf);
+  if(amt<=0){ toast("Vul eerst een bedrag in"); return; }
+  S.expenses.push({ id:c(), date:isoDate(new Date()), amount:amt, cat:qCat||"overig" });
+  save();
+  qBuf=""; weekOffset=0;
+  renderUitgaven();
+  const left=weekBudget()-weekSpent(0);
+  toast(eur(amt)+" genoteerd · nog "+eur(left)+" deze week");
+}
+function renderWeekNav(){
+  const t=wkLabel(weekOffset);
+  document.getElementById("weekTitle").textContent=t.charAt(0).toUpperCase()+t.slice(1);
+  document.getElementById("wkNext").disabled = weekOffset>=0;
+}
+function shiftWeek(n){ weekOffset=Math.min(0,weekOffset+n); renderUitgaven(); }
+function renderCatBreakdown(){
+  const r=weekRange(weekOffset), items=expensesBetween(r.start,r.end);
+  const el=document.getElementById("catBreakdown");
+  if(!items.length){ el.innerHTML='<div class="small-muted">Nog geen uitgaven in deze week.</div>'; return; }
+  el.innerHTML=catBars(items);
+}
+function catBars(items){
+  const map={};
+  items.forEach(e=>{ map[e.cat]=(map[e.cat]||0)+e.amount; });
+  const rows=Object.keys(map).map(k=>({k,v:map[k]})).sort((a,b)=>b.v-a.v);
+  const max=rows[0].v||1;
+  return rows.map(x=>`<div class="catrow">
+      <div class="cn">${catEmoji(x.k)} <span>${esc(catName(x.k))}</span></div>
+      <div class="cb"><i style="width:${(x.v/max*100).toFixed(0)}%"></i></div>
+      <div class="cv">${eur(x.v)}</div></div>`).join("");
+}
+function renderExpenseList(){
+  const r=weekRange(weekOffset);
+  const items=expensesBetween(r.start,r.end);
+  const el=document.getElementById("expenseList");
+  if(!items.length){ el.innerHTML='<div class="emptybox">Nog niets genoteerd in deze week.</div>'; return; }
+  const byDay={};
+  items.forEach(e=>{ (byDay[e.date]=byDay[e.date]||[]).push(e); });
+  el.innerHTML=Object.keys(byDay).sort().reverse().map(function(d){
+    const tot=byDay[d].reduce((s,e)=>s+e.amount,0);
+    return `<div class="daygroup">${dayLabel(d)} · ${eur(tot)}</div>`+
+      byDay[d].map(e=>`<div class="tx" onclick="deleteExpense('${e.id}')">
+        <div><div>${catEmoji(e.cat)} ${esc(catName(e.cat))}</div><div class="d">tik om te verwijderen</div></div>
+        <div class="neg">${eur(e.amount)}</div></div>`).join("");
+  }).join("");
+}
+function deleteExpense(id){
+  const e=S.expenses.find(x=>x.id===id); if(!e) return;
+  if(!confirm("Uitgave van "+eur(e.amount)+" verwijderen?")) return;
+  S.expenses=S.expenses.filter(x=>x.id!==id);
+  save(); renderUitgaven(); toast("Verwijderd");
+}
+function renderWeekTrend(){
+  const wb=weekBudget(), rows=[];
+  for(let i=3;i>=0;i--) rows.push({ off:-i, sp:weekSpent(-i) });
+  const max=Math.max(wb, ...rows.map(r=>r.sp), 1);
+  document.getElementById("weekTrend").innerHTML =
+    rows.map(function(r){
+      const over = wb>0 && r.sp>wb;
+      const lab = r.off===0?"deze week": r.off===-1?"vorige wk": Math.abs(r.off)+" wk terug";
+      return `<div class="catrow"><div class="cn" style="width:84px;">${lab}</div>
+        <div class="cb"><i style="width:${(r.sp/max*100).toFixed(0)}%;background:${over?"var(--red)":"var(--green)"}"></i></div>
+        <div class="cv ${over?"neg":"pos"}">${eur(r.sp)}</div></div>`;
+    }).join("") +
+    (wb>0?`<div class="small-muted">Weekbudget ${eur(wb)} · groen = binnen budget.</div>`:"") +
+    `<button class="btn sec" style="margin-top:12px;" onclick="openWeekCheck()">Weekcheck doen ${checkinDone()?"✓":""}</button>`;
+}
+
+/* ========== DOELEN: achterstanden, buffer, potjes ========== */
+function renderDoelen(){ renderArrears(); renderBuffer(); renderPots(); }
+
+function renderArrears(){
+  const el=document.getElementById("arrearsBlock");
+  const open=S.arrears.filter(a=>(a.amount-a.paid)>0.005);
+  const totalOpen=arrearsOpen();
+  let html=`<div class="row" style="margin-bottom:10px;"><h2 style="margin:0;">Achterstanden</h2>
+    <button class="btn small" onclick="openArrearModal()">+ Toevoegen</button></div>`;
+
+  if(open.some(a=>a.critical)){
+    html+=`<div class="alert red"><b>Zorgpremie — laat dit niet liggen.</b> Bij twee maanden achterstand moet je verzekeraar je een betalingsregeling aanbieden en kan je aanvullende verzekering worden beëindigd. Sta je na zes maanden nog open zonder regeling, dan meldt de verzekeraar je aan bij het CAK en betaal je een hogere bestuursrechtelijke premie die van je loon wordt ingehouden. Zelf bellen en om een regeling vragen voorkomt dat, en kost niets.</div>`;
+  }
+
+  if(!S.arrears.length){
+    html+=`<div class="card"><div class="small-muted">Nog niets geregistreerd. Heb je een incasso teruggeboekt of een rekening laten liggen — zorgverzekering, telefoon, huur? Zet hem hier neer. De app rekent uit wat je per week moet inlopen en houdt bij hoeveel er nog staat.</div></div>`;
+    el.innerHTML=html; return;
+  }
+
+  const paidTotal=S.arrears.reduce((s,a)=>s+Math.min(a.paid,a.amount),0);
+  const grand=S.arrears.reduce((s,a)=>s+a.amount,0);
+  const pct=grand>0?paidTotal/grand*100:0;
+  const wks=weeksUntilEarliestDue(open);
+
+  html+=`<div class="card">
+    <div class="row">
+      <div><div class="muted" style="font-size:13px;">Nog in te lopen</div><div class="big ${totalOpen>0?"neg":"pos"}">${eur(totalOpen)}</div></div>
+      <div style="text-align:right;"><div class="muted" style="font-size:11px;">al ingelopen</div><div style="font-weight:700;">${eur(paidTotal)}</div></div>
+    </div>
+    <div class="bar ${totalOpen>0?"red":"green"}"><i style="width:${pct.toFixed(0)}%"></i></div>
+    ${totalOpen>0
+      ? `<div class="small-muted">Op ${eur(totalOpen/Math.max(1,wks))} per week ben je hier over ${wks} ${wks===1?"week":"weken"} vanaf. Dit gaat vóór sparen — een achterstand die blijft liggen wordt duurder, spaargeld levert niets op.</div>`
+      : `<div class="small-muted pos">Alles ingelopen. Vanaf hier gaat alles naar je buffer.</div>`}
+  </div>`;
+
+  html+=`<div class="listwrap">`+S.arrears.map(function(a){
+    const rest=Math.max(0,a.amount-a.paid);
+    const p=a.amount>0?Math.min(100,a.paid/a.amount*100):100;
+    return `<div class="goal" onclick="openArrearModal('${a.id}')">
+      <div class="gt"><div class="gn">${a.critical?"🚨":"📄"} ${esc(a.name)}</div>
+        <div class="gv ${rest>0?"neg":"pos"}">${rest>0?eur(rest):"voldaan"}</div></div>
+      <div class="bar ${rest>0?"amber":"green"}" style="margin:8px 0 4px;"><i style="width:${p.toFixed(0)}%"></i></div>
+      <div class="gm">${eur(a.paid)} van ${eur(a.amount)}${a.due?" · uiterlijk "+nlDate(a.due):""}</div>
+    </div>`;
+  }).join("")+`</div>`;
+  el.innerHTML=html;
+}
+function weeksUntilEarliestDue(open){
+  const dues=open.map(a=>a.due).filter(Boolean).sort();
+  if(!dues.length) return 8;
+  const diff=Math.ceil((new Date(dues[0]+"T00:00:00")-new Date())/(7*86400000));
+  return Math.max(1,diff);
+}
+function openArrearModal(id){
+  const a=id?S.arrears.find(x=>x.id===id):null;
+  const opts=activeFixed().map(f=>`<option value="${f.id}">${esc(f.name)} — ${eur(f.amount)}</option>`).join("");
+  openModal(`
+    <h3>${a?"Achterstand bijwerken":"Achterstand toevoegen"}</h3>
+    ${!a?`<label class="fld"><span class="lt">Overnemen uit je vaste lasten</span>
+      <select id="ar_pick" onchange="prefillArrear()"><option value="">— zelf invullen —</option>${opts}</select></label>`:""}
+    <label class="fld"><span class="lt">Wat</span><input type="text" id="ar_name" placeholder="bijv. Zorgverzekering augustus" value="${a?esc(a.name):""}"></label>
+    <label class="fld"><span class="lt">Totaal openstaand (€)</span><input type="number" inputmode="decimal" id="ar_amt" step="0.01" value="${a?a.amount:""}"></label>
+    <label class="fld"><span class="lt">Daarvan al betaald (€)</span><input type="number" inputmode="decimal" id="ar_paid" step="0.01" value="${a?a.paid:0}"></label>
+    <label class="fld"><span class="lt">Uiterlijk betalen op</span><input type="date" id="ar_due" value="${a?(a.due||""):""}"></label>
+    <label class="fld swrow" style="justify-content:space-between;align-items:center;">
+      <span class="lt" style="margin:0;">Zorgverzekering (extra risico)</span>
+      <span class="switch"><input type="checkbox" id="ar_crit" ${a&&a.critical?"checked":""}><span class="sl"></span></span></label>
+    <button class="btn green" onclick="saveArrear(${a?"'"+a.id+"'":"null"})">Opslaan</button>
+    ${a?`<button class="btn sec" style="margin-top:8px;" onclick="payArrear('${a.id}')">Betaling afboeken</button>
+         <button class="btn danger" style="margin-top:8px;" onclick="deleteArrear('${a.id}')">Verwijderen</button>`:""}
+    <button class="btn sec" style="margin-top:8px;" onclick="closeModal()">Annuleren</button>`);
+}
+function prefillArrear(){
+  const id=document.getElementById("ar_pick").value; if(!id) return;
+  const f=S.fixedCosts.find(x=>x.id===id); if(!f) return;
+  document.getElementById("ar_name").value=f.name;
+  document.getElementById("ar_amt").value=f.amount;
+  document.getElementById("ar_crit").checked=/zorg|verzeker/i.test(f.name);
+}
+function saveArrear(id){
+  const name=document.getElementById("ar_name").value.trim();
+  const amt=num(document.getElementById("ar_amt").value);
+  if(!name||amt<=0){ toast("Vul naam en bedrag in"); return; }
+  const obj={ name, amount:amt, paid:Math.max(0,num(document.getElementById("ar_paid").value)),
+              due:document.getElementById("ar_due").value||"", critical:document.getElementById("ar_crit").checked };
+  if(id) Object.assign(S.arrears.find(x=>x.id===id), obj);
+  else S.arrears.push(Object.assign({id:c()},obj));
+  save(); closeModal(); renderDoelen(); toast("Opgeslagen");
+}
+function payArrear(id){
+  const a=S.arrears.find(x=>x.id===id); if(!a) return;
+  const rest=Math.max(0,a.amount-a.paid);
+  const v=prompt("Hoeveel heb je betaald? (nog open: "+eur(rest)+")", rest.toFixed(2));
+  if(v===null) return;
+  const amt=num(v); if(amt<=0) return;
+  a.paid=Math.min(a.amount,a.paid+amt);
+  save(); closeModal(); renderDoelen();
+  toast(a.paid>=a.amount ? "Volledig ingelopen 🎉" : eur(amt)+" afgeboekt");
+}
+function deleteArrear(id){
+  if(!confirm("Deze achterstand verwijderen?")) return;
+  S.arrears=S.arrears.filter(x=>x.id!==id);
+  save(); closeModal(); renderDoelen(); toast("Verwijderd");
+}
+
+function renderBuffer(){
+  const cp=currentPhase();
+  const target=cp.phase.target, amt=cp.amt;
+  const pct=target>cp.prev?clamp((amt-cp.prev)/(target-cp.prev)*100,0,100):100;
+  const per=bufferWeeklyRoom(), need=Math.max(0,target-amt);
+  const wks=per>0?Math.ceil(need/per):null;
+  document.getElementById("bufferCard").innerHTML=`
+    <div class="row">
+      <div><div class="muted" style="font-size:13px;">Buffer nu</div><div class="big">${eur(amt)}</div></div>
+      <div style="text-align:right;"><div class="muted" style="font-size:11px;">volgende mijlpaal</div><div style="font-weight:700;">${eur(target)}</div></div>
+    </div>
+    <div class="bar ${pct>=100?"green":""}"><i style="width:${pct.toFixed(0)}%"></i></div>
+    <div class="small-muted">${need>0
+      ? "Nog "+eur(need)+" te gaan"+(wks
+          ? " — er blijft "+eur(per)+" per week over ná je potjes en achterstanden, dus dit lukt in ongeveer "+wks+" "+(wks===1?"week":"weken")+"."
+          : (weeklyRoom()>0
+              ? ". Je hele maandelijkse ruimte gaat nu naar achterstanden en potjes. Zodra die weg zijn, begint je buffer te groeien."
+              : ". Er is nu geen maandelijkse ruimte om te sparen. Verlaag je weekbudget of schrap een vaste last."))
+      : "Mijlpaal gehaald."}</div>
+    <div class="divider"></div>
+    ${cp.phases.map(function(p,i){
+      const done=amt>=p.target;
+      return `<div class="phase ${done?"done":i===cp.i?"now":""}">
+        <div class="pi">${done?"✓":i+1}</div><div class="pn">${esc(p.label)}</div><div class="pv">${eur(p.target)}</div></div>`;
+    }).join("")}
+    <div class="small-muted">Buffer = saldo spaarrekening min wat er in je potjes zit. Je maandlasten zijn ${eur(maandlasten())} (vaste lasten ${eur(fixedTotalAll())} + weekbudget ${eur(weekBudget()*4.345)}).</div>`;
+}
+
+function renderPots(){
+  const el=document.getElementById("potList");
+  if(!S.pots.length) el.innerHTML='<div class="emptybox">Nog geen potjes.</div>';
+  else el.innerHTML=S.pots.map(function(p){
+    const pct=p.target>0?clamp(p.saved/p.target*100,0,100):0;
+    const per=potMonthly(p);
+    return `<div class="goal" onclick="openPotModal('${p.id}')">
+      <div class="gt"><div class="gn">${p.emoji||"🎯"} ${esc(p.name)}</div>
+        <div class="gv">${eur(p.saved)} <span class="muted">/ ${eur(p.target)}</span></div></div>
+      <div class="bar ${pct>=100?"green":""}" style="margin:8px 0 4px;"><i style="width:${pct.toFixed(0)}%"></i></div>
+      <div class="gm">${p.due?"Klaar voor "+nlMonth(p.due)+" · ":""}${per>0?eur(per)+" per maand nodig":"doel gehaald"}</div>
+    </div>`;
+  }).join("");
+
+  const totMonthly=S.pots.reduce((s,p)=>s+potMonthly(p),0);
+  const totTarget=S.pots.reduce((s,p)=>s+(Number(p.target)||0),0);
+  const room=weeklyRoom()*4.345;
+  document.getElementById("potSummary").innerHTML=`
+    <div class="stat"><span class="k">Nu in potjes</span><span class="v">${eur(potsSaved())}</span></div>
+    <div class="stat"><span class="k">Totaal doel</span><span class="v">${eur(totTarget)}</span></div>
+    <div class="stat"><span class="k">Samen per maand nodig</span><span class="v ${totMonthly>room?"neg":"pos"}">${eur(totMonthly)}</span></div>
+    <div class="stat"><span class="k">Jouw maandelijkse ruimte</span><span class="v">${eur(room)}</span></div>
+    ${totMonthly>room?`<div class="small-muted neg">Je potjes vragen meer dan er maandelijks overblijft. Zet doelbedragen lager of data verder weg — een plan dat niet past, haal je niet.</div>`:`<div class="small-muted">Dit past binnen je ruimte.</div>`}`;
+}
+function potMonthly(p){
+  const rest=Math.max(0,(Number(p.target)||0)-(Number(p.saved)||0));
+  if(rest<=0) return 0;
+  return rest/Math.max(1, p.due?monthsUntil(p.due):12);
+}
+function openPotModal(id){
+  const p=id?S.pots.find(x=>x.id===id):null;
+  openModal(`
+    <h3>${p?esc(p.name):"Nieuw potje"}</h3>
+    <label class="fld"><span class="lt">Naam</span><input type="text" id="p_name" value="${p?esc(p.name):""}" placeholder="bijv. Vakantie 2027"></label>
+    <label class="fld"><span class="lt">Icoon</span><input type="text" id="p_emoji" maxlength="4" value="${p?esc(p.emoji||"🎯"):"🎯"}"></label>
+    <label class="fld"><span class="lt">Doelbedrag (€)</span><input type="number" inputmode="decimal" id="p_target" step="0.01" value="${p?p.target:""}"></label>
+    <label class="fld"><span class="lt">Klaar voor (maand)</span><input type="month" id="p_due" value="${p?(p.due||""):""}"></label>
+    <button class="btn green" onclick="savePot(${p?"'"+p.id+"'":"null"})">Opslaan</button>
+    ${p?`<div class="grid2" style="margin-top:8px;">
+          <button class="btn sec" onclick="potMove('${p.id}',1)">+ Storten</button>
+          <button class="btn sec" onclick="potMove('${p.id}',-1)">− Opnemen</button></div>
+        <button class="btn danger" style="margin-top:8px;" onclick="deletePot('${p.id}')">Potje verwijderen</button>`:""}
+    <button class="btn sec" style="margin-top:8px;" onclick="closeModal()">Annuleren</button>`);
+}
+function savePot(id){
+  const name=document.getElementById("p_name").value.trim();
+  const target=num(document.getElementById("p_target").value);
+  if(!name||target<=0){ toast("Vul naam en doelbedrag in"); return; }
+  const obj={ name, emoji:document.getElementById("p_emoji").value.trim()||"🎯", target,
+              due:document.getElementById("p_due").value||"" };
+  if(id) Object.assign(S.pots.find(x=>x.id===id), obj);
+  else S.pots.push(Object.assign({id:c(),saved:0},obj));
+  save(); closeModal(); renderDoelen(); toast("Opgeslagen");
+}
+function potMove(id,sign){
+  const p=S.pots.find(x=>x.id===id); if(!p) return;
+  const v=prompt(sign>0?"Hoeveel storten in "+p.name+"?":"Hoeveel opnemen uit "+p.name+"?","");
+  if(v===null) return;
+  const amt=num(v); if(amt<=0) return;
+  p.saved=Math.max(0,(Number(p.saved)||0)+sign*amt);
+  save(); closeModal(); renderDoelen();
+  toast(sign>0?eur(amt)+" opzij gezet":eur(amt)+" uit potje gehaald");
+}
+function deletePot(id){
+  if(!confirm("Potje verwijderen? Alleen deze administratie verdwijnt, je geld blijft staan.")) return;
+  S.pots=S.pots.filter(x=>x.id!==id);
+  save(); closeModal(); renderDoelen(); toast("Verwijderd");
+}
+
+/* ========== WEEKCHECK ========== */
+function openWeekCheck(){
+  const wb=weekBudget(), sp=weekSpent(0), diff=wb-sp;
+  const st=checkinStreak(), r=healthScore();
+  const range=weekRange(0), items=expensesBetween(range.start,range.end);
+  openModal(`
+    <h3>Weekcheck</h3>
+    ${daysLeftInWeek()>1?`<div class="small-muted" style="margin-bottom:10px;">De week loopt nog ${daysLeftInWeek()} dagen — dit is de stand tot nu toe.</div>`:""}
+    <div class="alert ${diff>=0?"green":"amber"}">
+      ${diff>=0
+        ? `Je bleef deze week <b>${eur(diff)}</b> onder je budget. Maak het echt: zet dat bedrag nu over naar je spaarrekening, anders rolt het gewoon door naar volgende week.`
+        : `Je zat <b>${eur(-diff)}</b> boven je budget. Dat gebeurt. Kijk hieronder waar het zat en pak volgende week één categorie aan — niet alle vier.`}
+    </div>
+    <div class="stat"><span class="k">Uitgegeven deze week</span><span class="v">${eur(sp)}</span></div>
+    <div class="stat"><span class="k">Weekbudget</span><span class="v">${eur(wb)}</span></div>
+    <div class="stat"><span class="k">Gezondheidsscore</span><span class="v" style="color:${r.color}">${r.total}/100</span></div>
+    <div class="stat"><span class="k">Reeks</span><span class="v">${st} ${st===1?"week":"weken"} op rij</span></div>
+    <div style="margin-top:12px;">${items.length?catBars(items):'<div class="small-muted">Geen uitgaven genoteerd deze week.</div>'}</div>
+    <label class="fld" style="margin-top:14px;"><span class="lt">Wat viel je op? (optioneel)</span>
+      <input type="text" id="wc_note" placeholder="bijv. drie keer besteld op één week"></label>
+    <button class="btn green" onclick="saveWeekCheck()">Week afvinken</button>
+    <button class="btn sec" style="margin-top:8px;" onclick="closeModal()">Later</button>`);
+}
+function saveWeekCheck(){
+  const note=(document.getElementById("wc_note").value||"").trim();
+  if(!checkinDone()) S.checkins.push({ week:currentWeekKey(), date:isoDate(new Date()), spent:weekSpent(0), budget:weekBudget(), note });
+  recordScore(); save(); closeModal();
+  showView("overzicht");
+  toast("Week afgevinkt · reeks "+checkinStreak());
+}
+
+/* ========== OVERZICHT-BLOKKEN ========== */
+function renderAlerts(){
+  const out=[], open=arrearsOpen();
+  if(open>0) out.push(`<div class="alert red"><b>${eur(open)} aan achterstanden.</b> Dit wordt duurder als het blijft liggen — dit gaat vóór sparen.
+    <button class="btn small" style="width:100%;" onclick="showView('doelen')">Naar je inhaalplan</button></div>`);
+
+  const neg=S.accounts.filter(a=>(Number(a.balance)||0)<0);
+  if(neg.length) out.push(`<div class="alert amber">Je staat rood op: <b>${neg.map(a=>esc(a.name)).join(", ")}</b>.</div>`);
+
+  const wb=weekBudget(), sp=weekSpent(0);
+  if(wb>0 && sp>wb) out.push(`<div class="alert amber">Je zit <b>${eur(sp-wb)}</b> boven je weekbudget, met nog ${daysLeftInWeek()} ${daysLeftInWeek()===1?"dag":"dagen"} te gaan.</div>`);
+
+  const dow=new Date().getDay();
+  if(!checkinDone() && (dow===0||dow===6))
+    out.push(`<div class="alert green">Tijd voor je weekcheck — één minuut.
+      <button class="btn small green" style="width:100%;" onclick="openWeekCheck()">Weekcheck doen</button></div>`);
+
+  if(!S.expenses.length)
+    out.push(`<div class="alert amber"><b>Begin hier.</b> Je vaste lasten kloppen, maar je vrije uitgaven worden nergens gemeten — en dáár verdwijnt het geld. Noteer vanaf vandaag elke uitgave. Over twee weken weet je precies waar het heen gaat.
+      <button class="btn small" style="width:100%;" onclick="showView('uitgaven')">Eerste uitgave noteren</button></div>`);
+
+  document.getElementById("ovAlerts").innerHTML=out.join("");
+}
+function renderOvWeek(){
+  const wb=weekBudget(), sp=weekSpent(0), left=wb-sp;
+  const pct=wb>0?clamp(sp/wb*100,0,100):0;
+  document.getElementById("ovWeek").innerHTML=`
+    <div class="weekhero ${left<0?"over":""}" onclick="showView('uitgaven')">
+      <div class="wl">Nog te besteden deze week</div>
+      <div class="wa">${eur(left)}</div>
+      <div class="wb"><i style="width:${pct.toFixed(0)}%"></i></div>
+      <div class="wf"><span>${eur(sp)} uitgegeven</span><span>budget ${eur(wb)}</span></div>
+    </div>`;
+}
+function renderOvBuffer(){
+  const cp=currentPhase();
+  const pct=cp.phase.target>cp.prev?clamp((cp.amt-cp.prev)/(cp.phase.target-cp.prev)*100,0,100):100;
+  const st=checkinStreak();
+  document.getElementById("ovBuffer").innerHTML=`
+    <div class="card tap" onclick="showView('doelen')">
+      <div class="row">
+        <div><div class="muted" style="font-size:13px;">Noodbuffer · ${esc(cp.phase.label)}</div><div class="big">${eur(cp.amt)}</div></div>
+        <div style="text-align:right;"><div class="muted" style="font-size:11px;">mijlpaal</div><div style="font-weight:700;">${eur(cp.phase.target)}</div></div>
+      </div>
+      <div class="bar"><i style="width:${pct.toFixed(0)}%"></i></div>
+      ${st>0?`<span class="streak">🔥 ${st} ${st===1?"week":"weken"} op rij</span>`:""}
+    </div>`;
+}
+
+/* ---------- utils ---------- */
+function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function dateStr(){ const d=new Date(); return d.toLocaleDateString("nl-NL",{day:"2-digit",month:"2-digit",year:"numeric"}); }
+function monthLabel(){ return new Date().toLocaleDateString("nl-NL",{month:"short",year:"2-digit"}); }
+
+/* ---------- init ---------- */
+document.getElementById("todayDate").textContent = new Date().toLocaleDateString("nl-NL",{day:"numeric",month:"long"});
+showView("overzicht");
+</script>
+</body>
+</html>
