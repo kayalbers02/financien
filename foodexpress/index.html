@@ -1,0 +1,363 @@
+<title>Snackavond Deurne</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Archivo:wght@400;600;800&display=swap">
+<style>
+/* Layout: snackbar-menubord — chunky signage header, a grid of animated food tiles you tap to build tonight's list, sticky order bar at the bottom */
+:root {
+  --bg: #FFF4CF;        /* frietzak-geel papier */
+  --surface: #FFFFFF;   /* mayo */
+  --ink: #2A1A10;       /* goed doorgebakken */
+  --muted: #6F5A44;
+  --accent: #D9261C;    /* ketchup */
+  --accent-ink: #FFFFFF;
+  --line: #EAD9A6;
+  --chip: #FFE48A;
+  --font-display: "Bowlby One", "Arial Black", Impact, sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1C130E; --surface: #2A1E17; --ink: #FFEFD2; --muted: #C9B193;
+    --accent: #FF5545; --accent-ink: #1C130E; --line: #3D2C21; --chip: #4A3410;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1C130E; --surface: #2A1E17; --ink: #FFEFD2; --muted: #C9B193;
+  --accent: #FF5545; --accent-ink: #1C130E; --line: #3D2C21; --chip: #4A3410;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 120px;
+}
+.wrap { max-width: 980px; margin: 0 auto; }
+
+header { padding-block: 28px 8px; display: grid; gap: 10px; }
+.eyebrow { font-weight: 800; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+h1 {
+  font-family: var(--font-display); font-weight: 400; margin: 0;
+  font-size: clamp(40px, 9vw, 84px); line-height: .95; letter-spacing: -.01em; text-wrap: balance;
+}
+h1 span { color: var(--accent); display: inline-block; animation: wobble 2.4s ease-in-out infinite; transform-origin: 50% 80%; }
+.lead { margin: 0; max-width: 56ch; font-size: 18px; color: var(--muted); }
+.lead b { color: var(--ink); }
+
+.order-big {
+  justify-self: start; margin-top: 8px;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: var(--accent-ink); text-decoration: none;
+  font-family: var(--font-display); font-size: 22px; padding: 14px 24px; border-radius: 999px;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 55%, var(--ink));
+  transition: transform .12s, box-shadow .12s;
+}
+.order-big:hover { transform: translateY(-2px); box-shadow: 0 7px 0 color-mix(in srgb, var(--accent) 55%, var(--ink)); }
+.order-big:active { transform: translateY(3px); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 55%, var(--ink)); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; margin: 36px 0 4px; }
+.hint { margin: 0 0 16px; color: var(--muted); }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.food {
+  position: relative; border: 2px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 20px; padding: 10px 10px 14px; cursor: pointer; font: inherit; text-align: center;
+  display: grid; gap: 4px; justify-items: center;
+  animation: popin .5s cubic-bezier(.2,1.6,.4,1) both; animation-delay: calc(var(--i) * 80ms);
+  transition: transform .15s, border-color .15s;
+}
+.food:hover { transform: translateY(-3px) rotate(-1deg); border-color: var(--accent); }
+.food:active { transform: scale(.96); }
+.food svg { width: 100%; max-width: 150px; height: auto; aspect-ratio: 1; overflow: visible; }
+.food .name { font-family: var(--font-display); font-size: 20px; line-height: 1.1; }
+.food .sub { font-size: 13px; color: var(--muted); }
+.badge {
+  position: absolute; top: 8px; right: 8px; min-width: 30px; height: 30px; padding: 0 8px;
+  border-radius: 999px; background: var(--accent); color: var(--accent-ink);
+  font-weight: 800; display: grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.food.bump { animation: bump .35s ease; }
+
+.list { background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 16px; display: grid; gap: 12px; }
+.list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.list li { display: flex; align-items: center; gap: 10px; }
+.list li .item { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+.qty { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.qty button {
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line);
+  background: var(--bg); color: var(--ink); font: 800 18px/1 var(--font-body); cursor: pointer;
+}
+.qty span { min-width: 1.5ch; text-align: center; font-weight: 800; }
+.empty { color: var(--muted); margin: 0; }
+.add { display: flex; gap: 8px; flex-wrap: wrap; }
+.add input {
+  flex: 1 1 200px; min-width: 0; padding: 10px 14px; border-radius: 999px;
+  border: 2px solid var(--line); background: var(--bg); color: var(--ink); font: inherit;
+}
+.btn-ghost {
+  padding: 10px 16px; border-radius: 999px; border: 2px solid var(--ink); background: transparent;
+  color: var(--ink); font: 800 15px var(--font-body); cursor: pointer;
+}
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.clear { background: none; border: 0; color: var(--muted); text-decoration: underline; font: inherit; cursor: pointer; padding: 4px; }
+
+.how { margin-top: 28px; display: grid; gap: 6px; color: var(--muted); font-size: 14px; max-width: 65ch; }
+.how p { margin: 0; }
+
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  background: var(--ink); color: var(--bg);
+  padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bar .count { font-weight: 800; font-variant-numeric: tabular-nums; }
+.bar .count small { display: block; font-weight: 400; opacity: .75; }
+.bar a {
+  background: var(--accent); color: var(--accent-ink); text-decoration: none; white-space: nowrap;
+  font-family: var(--font-display); font-size: 18px; padding: 10px 20px; border-radius: 999px;
+}
+
+/* ---- food animations ---- */
+@keyframes popin { from { transform: scale(.6) translateY(20px); opacity: .2; } to { transform: none; opacity: 1; } }
+@keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.07) rotate(2deg); } 100% { transform: scale(1); } }
+@keyframes wobble { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-3px); } }
+@keyframes fry { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes steam { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: .7; } 100% { transform: translateY(-22px); opacity: 0; } }
+@keyframes drop { 0% { transform: translateY(-46px); opacity: 0; } 25%,85% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes lift { 0%,15% { transform: translate(0,0) rotate(0); } 50%,65% { transform: translate(6px,-16px) rotate(-8deg); } 100% { transform: translate(0,0) rotate(0); } }
+@keyframes stretch { 0%,15% { transform: scaleY(0); } 50%,65% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
+@keyframes melt { 0%,100% { transform: scaleY(.6); } 50% { transform: scaleY(1.15); } }
+@keyframes bubble { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-34px); opacity: 0; } }
+@keyframes sizzle { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-1.5px); } 75% { transform: translateX(1.5px); } }
+
+.f1 { animation: fry 1.1s ease-in-out infinite; }
+.f2 { animation: fry 1.1s ease-in-out .18s infinite; }
+.f3 { animation: fry 1.1s ease-in-out .36s infinite; }
+.f4 { animation: fry 1.1s ease-in-out .54s infinite; }
+.f5 { animation: fry 1.1s ease-in-out .72s infinite; }
+.st  { animation: steam 2s ease-out infinite; transform-box: fill-box; }
+.st2 { animation-delay: .7s; } .st3 { animation-delay: 1.4s; }
+.layer { animation: drop 3.2s cubic-bezier(.3,1.4,.5,1) infinite both; }
+.l1 { animation-delay: 0s; } .l2 { animation-delay: .12s; } .l3 { animation-delay: .24s; } .l4 { animation-delay: .36s; } .l5 { animation-delay: .48s; }
+.slice { animation: lift 2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 0% 100%; }
+.string { animation: stretch 2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.melt { animation: melt 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 0%; }
+.bb { animation: bubble 1.8s ease-in infinite; }
+.bb2 { animation-delay: .6s; } .bb3 { animation-delay: 1.2s; }
+.siz { animation: sizzle .25s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Snackavond · Deurne</div>
+    <h1>Honger? <span>Tik&nbsp;aan.</span></h1>
+    <p class="lead">Tik op wat je vanavond wilt, dan houd ik je lijstje bij. Klaar? Druk op <b>Bestellen</b> en je bestelt gewoon op de site van Foodexpress Deurne.</p>
+    <a class="order-big" href="https://www.foodexpressdeurne.nl/" target="_blank" rel="noopener">Bestellen ↗</a>
+  </header>
+
+  <h2>Waar heb je zin in?</h2>
+  <p class="hint">Elke tik is er één bij. Wat er precies op de kaart staat en wat het kost, zie je bij het bestellen.</p>
+
+  <div class="grid" id="grid">
+    <!-- Friet -->
+    <button class="food" data-name="Friet" style="--i:0" type="button" aria-label="Friet toevoegen">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <g fill="#F6C33B" stroke="#C98A12" stroke-width="2">
+          <rect class="f1" x="34" y="22" width="9" height="52" rx="3"/>
+          <rect class="f2" x="45" y="14" width="9" height="60" rx="3"/>
+          <rect class="f3" x="56" y="18" width="9" height="56" rx="3"/>
+          <rect class="f4" x="67" y="12" width="9" height="62" rx="3"/>
+          <rect class="f5" x="78" y="24" width="9" height="50" rx="3"/>
+        </g>
+        <path d="M28 56 L92 56 L84 108 L36 108 Z" fill="#D9261C"/>
+        <path d="M28 56 L92 56 L90 66 L30 66 Z" fill="#B51E15"/>
+        <ellipse cx="60" cy="86" rx="12" ry="8" fill="#FFFFFF"/>
+        <path d="M54 86 h12" stroke="#D9261C" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="name">Friet</span><span class="sub">met of zonder</span>
+    </button>
+
+    <!-- Burger -->
+    <button class="food" data-name="Burger" style="--i:1" type="button" aria-label="Burger toevoegen">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <rect class="layer l1" x="22" y="90" width="76" height="14" rx="7" fill="#E0A04B"/>
+        <rect class="layer l2" x="20" y="78" width="80" height="14" rx="7" fill="#6B3A1E"/>
+        <path class="layer l3" d="M20 76 h80 l-6 8 l-8-6 l-8 8 l-8-8 l-8 8 l-8-8 l-8 8 l-8-8 l-8 6 Z" fill="#F7C531"/>
+        <path class="layer l4" d="M18 70 q8-6 14 0 q8-6 14 0 q8-6 14 0 q8-6 14 0 q8-6 14 0 q8-6 14 0 v4 h-84 Z" fill="#4FAE5A"/>
+        <g class="layer l5">
+          <path d="M22 68 q0-36 38-36 q38 0 38 36 Z" fill="#E7A24C"/>
+          <g fill="#FFF3D1"><ellipse cx="44" cy="46" rx="3" ry="1.6"/><ellipse cx="60" cy="40" rx="3" ry="1.6"/><ellipse cx="76" cy="48" rx="3" ry="1.6"/><ellipse cx="54" cy="54" rx="3" ry="1.6"/></g>
+        </g>
+      </svg>
+      <span class="name">Burgers</span><span class="sub">vers gestapeld</span>
+    </button>
+
+    <!-- Snacks -->
+    <button class="food" data-name="Snack" style="--i:2" type="button" aria-label="Snack toevoegen">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <g stroke="#B7A27F" stroke-width="3" fill="none" stroke-linecap="round">
+          <path class="st" d="M40 44 q-5-8 0-16 q5-8 0-16"/>
+          <path class="st st2" d="M60 40 q-5-8 0-16 q5-8 0-16"/>
+          <path class="st st3" d="M80 44 q-5-8 0-16 q5-8 0-16"/>
+        </g>
+        <g class="siz">
+          <rect x="18" y="60" width="84" height="20" rx="10" fill="#8A4B23"/>
+          <rect x="18" y="60" width="84" height="7" rx="3.5" fill="#A55E2E"/>
+          <rect x="30" y="84" width="60" height="22" rx="11" fill="#C27A35"/>
+          <g fill="#9A5B22"><circle cx="42" cy="92" r="1.6"/><circle cx="52" cy="98" r="1.6"/><circle cx="64" cy="91" r="1.6"/><circle cx="76" cy="97" r="1.6"/></g>
+        </g>
+      </svg>
+      <span class="name">Snacks</span><span class="sub">uit het vet</span>
+    </button>
+
+    <!-- Pizza -->
+    <button class="food" data-name="Pizza" style="--i:3" type="button" aria-label="Pizza toevoegen">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="68" r="44" fill="#E3A24F"/>
+        <circle cx="60" cy="68" r="37" fill="#F2C94C"/>
+        <g fill="#C8322A"><circle cx="44" cy="58" r="6"/><circle cx="72" cy="82" r="6"/><circle cx="46" cy="86" r="5"/></g>
+        <rect class="string" x="68" y="44" width="3" height="20" rx="1.5" fill="#FBE08A"/>
+        <rect class="string" x="76" y="50" width="3" height="16" rx="1.5" fill="#FBE08A"/>
+        <g class="slice">
+          <path d="M60 68 L60 24 A44 44 0 0 1 98 46 Z" fill="#E3A24F"/>
+          <path d="M60 68 L60 31 A37 37 0 0 1 92 49.5 Z" fill="#F2C94C"/>
+          <circle cx="72" cy="48" r="5" fill="#C8322A"/>
+        </g>
+      </svg>
+      <span class="name">Pizza</span><span class="sub">met draadjes kaas</span>
+    </button>
+
+    <!-- Kapsalon -->
+    <button class="food" data-name="Kapsalon" style="--i:4" type="button" aria-label="Kapsalon toevoegen">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <g stroke="#B7A27F" stroke-width="3" fill="none" stroke-linecap="round">
+          <path class="st" d="M48 40 q-5-8 0-16 q5-8 0-16"/>
+          <path class="st st2" d="M72 40 q-5-8 0-16 q5-8 0-16"/>
+        </g>
+        <path d="M14 70 L106 70 L98 104 L22 104 Z" fill="#C9CED3"/>
+        <path d="M14 70 L106 70 L104 76 L16 76 Z" fill="#AEB4BA"/>
+        <g fill="#F6C33B"><rect x="24" y="58" width="72" height="14" rx="5"/></g>
+        <g fill="#8A4B23"><rect x="28" y="54" width="18" height="8" rx="4"/><rect x="50" y="52" width="20" height="9" rx="4"/><rect x="74" y="54" width="18" height="8" rx="4"/></g>
+        <path class="melt" d="M24 52 h72 v6 q-6 10-10 0 q-6 12-12 0 q-6 10-12 0 q-6 12-12 0 q-6 10-12 0 q-6 12-14 0 Z" fill="#FFE07A"/>
+        <g fill="#4FAE5A"><circle cx="34" cy="48" r="5"/><circle cx="58" cy="46" r="5"/><circle cx="84" cy="48" r="5"/></g>
+        <g fill="#E8473B"><circle cx="46" cy="47" r="4"/><circle cx="72" cy="46" r="4"/></g>
+      </svg>
+      <span class="name">Kapsalon</span><span class="sub">alles in één bak</span>
+    </button>
+
+    <!-- Drinken -->
+    <button class="food" data-name="Drinken" style="--i:5" type="button" aria-label="Drinken toevoegen">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <rect x="64" y="10" width="6" height="40" rx="3" fill="#D9261C" transform="rotate(14 67 30)"/>
+        <path d="M32 34 L88 34 L80 108 L40 108 Z" fill="#E4F2FA" stroke="#9CC3D8" stroke-width="2"/>
+        <path d="M35 50 L85 50 L80 106 L40 106 Z" fill="#6B2E1B"/>
+        <g fill="#C9876A"><circle class="bb" cx="50" cy="96" r="3"/><circle class="bb bb2" cx="62" cy="100" r="2.5"/><circle class="bb bb3" cx="72" cy="94" r="3"/></g>
+        <rect x="28" y="28" width="64" height="8" rx="4" fill="#9CC3D8"/>
+      </svg>
+      <span class="name">Drinken</span><span class="sub">koud erbij</span>
+    </button>
+  </div>
+
+  <h2>Mijn lijstje</h2>
+  <p class="hint">Dit lijstje blijft op je eigen telefoon staan. Het wordt niet verstuurd: bestellen doe je op de site van Foodexpress.</p>
+  <div class="list">
+    <ul id="items"></ul>
+    <p class="empty" id="empty">Nog niks aangetikt. Tik hierboven op wat je wilt, of typ hieronder iets specifieks.</p>
+    <form class="add" id="addForm">
+      <label for="custom" hidden>Iets specifieks toevoegen</label>
+      <input id="custom" type="text" placeholder="Bijv. frikandel speciaal" autocomplete="off" maxlength="60">
+      <button class="btn-ghost" type="submit">Toevoegen</button>
+    </form>
+    <div class="row">
+      <button class="clear" id="clear" type="button">Lijstje leegmaken</button>
+    </div>
+  </div>
+
+  <div class="how">
+    <p>Persoonlijke snelkoppeling, geen officiële pagina van Foodexpress Deurne. De knop Bestellen opent hun eigen website, dus je bestelling komt binnen zoals elke andere online bestelling bij hen.</p>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="count" id="barCount">Nog niks gekozen<small>Tik op eten om te beginnen</small></div>
+    <a href="https://www.foodexpressdeurne.nl/" target="_blank" rel="noopener">Bestellen ↗</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'snackavond-lijst';
+  var list = [];
+  try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if (!Array.isArray(list)) list = []; } catch (e) { list = []; }
+
+  var itemsEl = document.getElementById('items');
+  var emptyEl = document.getElementById('empty');
+  var barEl = document.getElementById('barCount');
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {} }
+  function find(name) { for (var i = 0; i < list.length; i++) if (list[i].name.toLowerCase() === name.toLowerCase()) return i; return -1; }
+  function add(name, n) {
+    var i = find(name);
+    if (i === -1) { if (n > 0) list.push({ name: name, qty: n }); }
+    else { list[i].qty += n; if (list[i].qty <= 0) list.splice(i, 1); }
+    save(); render();
+  }
+
+  function render() {
+    itemsEl.textContent = '';
+    var total = 0;
+    list.forEach(function (it) {
+      total += it.qty;
+      var li = document.createElement('li');
+      var name = document.createElement('span'); name.className = 'item'; name.textContent = it.name;
+      var q = document.createElement('span'); q.className = 'qty';
+      var minus = document.createElement('button'); minus.type = 'button'; minus.textContent = '−'; minus.setAttribute('aria-label', 'Eén ' + it.name + ' minder');
+      var num = document.createElement('span'); num.textContent = it.qty;
+      var plus = document.createElement('button'); plus.type = 'button'; plus.textContent = '+'; plus.setAttribute('aria-label', 'Eén ' + it.name + ' meer');
+      minus.onclick = function () { add(it.name, -1); };
+      plus.onclick = function () { add(it.name, 1); };
+      q.append(minus, num, plus); li.append(name, q); itemsEl.appendChild(li);
+    });
+    emptyEl.hidden = list.length > 0;
+    document.querySelectorAll('.food').forEach(function (b) {
+      var i = find(b.dataset.name), badge = b.querySelector('.badge');
+      if (i > -1) {
+        if (!badge) { badge = document.createElement('span'); badge.className = 'badge'; b.appendChild(badge); }
+        badge.textContent = list[i].qty;
+      } else if (badge) badge.remove();
+    });
+    if (total === 0) barEl.innerHTML = 'Nog niks gekozen<small>Tik op eten om te beginnen</small>';
+    else barEl.innerHTML = total + (total === 1 ? ' ding' : ' dingen') + ' op je lijstje<small>' + list.map(function (it) { return it.qty + '× ' + it.name.replace(/[<>&]/g, ''); }).join(', ') + '</small>';
+  }
+
+  document.querySelectorAll('.food').forEach(function (b) {
+    b.addEventListener('click', function () {
+      add(b.dataset.name, 1);
+      b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+    });
+  });
+  document.getElementById('addForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var inp = document.getElementById('custom'), v = inp.value.trim();
+    if (v) { add(v, 1); inp.value = ''; }
+  });
+  document.getElementById('clear').addEventListener('click', function () { list = []; save(); render(); });
+
+  render();
+})();
+</script>
