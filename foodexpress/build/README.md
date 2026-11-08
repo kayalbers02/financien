@@ -1,22 +1,26 @@
 # Snackavond Deurne — bouwen
 
-`index.html` (één map hoger) wordt gemaakt uit `template.html` + `menu.json`.
+`build.py` maakt twee pagina's (één map hoger) uit `template2.html` + `menu.json` + `art.py`:
 
-- **Stijl:** opbouw en kleuren van Pixmoza (nachtblauw, ivoor, roze, honing, lavendel schaduwen),
-  typografie van CreativeByKay (Cabinet Grotesk, Zodiak, Satoshi, als data-URI ingebakken).
-- **Links:** elk gerecht linkt naar `https://www.foodexpressdeurne.nl/#product<id>`, elke categorie
-  naar `#categorie<id>`. Dat zijn de ankers op de menupagina van Foodexpress (Sitedish-platform).
-  Een link die iets direct in de winkelwagen zet bestaat daar niet.
+| Bestand | Versie | Tik op een gerecht |
+|---|---|---|
+| `index.html` | Werkt nu | opent dat gerecht op foodexpressdeurne.nl (`#product<id>`) |
+| `demo.html` | Demo | gaat in een winkelwagen op de pagina zelf; afrekenen is nagespeeld, er wordt niets besteld |
 
-## Menu verversen
+- **Stijl:** opbouw van de Foodexpress-site (witte gerechtkaarten, turquoise prijsknoppen,
+  categoriebalk, alle categorieën onder elkaar) met CreativeByKay-typografie en -kleuren
+  (Cabinet Grotesk + Zodiak, als data-URI ingebakken). Beweging van CreativeByKay
+  (paginawissel, openschuivende regels, veeg op knoppen) en Pixmoza (zwevende blokjes, harde schaduw).
+- **Winkelwagen doorzetten** naar Foodexpress kan niet van buitenaf: hun winkelwagen leeft op de
+  server van Sitedish. Daarvoor is een koppeling van Foodexpress/Sitedish nodig.
 
-1. Sla de homepage van foodexpressdeurne.nl op en haal de gerechten eruit naar `menu.json`
-   (per categorie: `c` = categorie-id, `name`, `items` met `id`, `n` naam, `p` prijs, `d` omschrijving).
-2. Bouw opnieuw:
+## Opnieuw bouwen
 
 ```
 python3 build.py menu.json ../../../creativebykay-website/assets/fonts \
-  ../../../creativebykay-website/assets/images/beeldmerk-teal.svg
+  ../../../creativebykay-website/assets/images/beeldmerk-teal.svg \
+  https://claude.ai/artifact/6C9qisuF9cATN2FxZP4FZr https://claude.ai/artifact/5KuG8aPwDuYKZFcwhy5TTf
 ```
 
-Pas daarna de datum (`{{DATE}}` in `build.py`) aan.
+`menu.json` komt van de homepage van foodexpressdeurne.nl (per categorie `c`, `name`, `items`
+met `id`, `n`, `p`, `d`). Pas na verversen ook `DATE` in `build.py` aan.
